@@ -2,6 +2,7 @@
 #include <pcap.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "ethernet.h"
 #include "ip.h"
 #include "arp.h"
@@ -9,31 +10,39 @@
 #include "udp.h"
 #include "tcp.h"
 
+#define ETHR 0
+#define IP 1
+#define ARP 2
+#define UDP 3
+#define TCP 4 
+#define ICMP 5
+#define UNKNOWN 6
+#define PAYLOAD 7
 
-void printPacket(struct pcap_pkthdr *, const u_char *);
+int ethr(struct pcap_pkthdr *, const u_char *, u_char **, int *);
+int ip(u_char **, int *, u_char **);
+int arp(u_char **, int *);
+int udp(u_char **, int *);
+int tcp(u_char **, int *, u_char **);
+int icmp(u_char **);
 
 int main(int argc, char **argv) {
 	pcap_t *pcap;
 	struct pcap_pkthdr *header;
 	const u_char *packet;
-	struct ethr_obj *ethr;
-	struct ip_obj *ip;
-	struct arp_obj *arp;
-	struct udp_obj *udp;
-	struct tcp_obj *tcp;
+	u_char *pdu;
+	u_char *psuedo_header;
+	int pdu_length;
+	int next_type;
 	int cur;
-	
 	char errorBuffer[PCAP_ERRBUF_SIZE];
 	
-	printf("Hello\n");
-	
-	if (argc == 1) {
+	if (argc < 2) {
 		printf("No file given\n");
 		return 0;
 	}
 	
 	// Open Pcap file
-	printf("Loading %s\n", argv[1]);
 	pcap = pcap_open_offline(argv[1], errorBuffer);
 	
 	if (!pcap) {
@@ -42,67 +51,136 @@ int main(int argc, char **argv) {
 	}
 	
 	cur = 1;
+	
+	// Open each Packet
 	while (pcap_next_ex(pcap, &header, &packet) == 1) {
-		printf("Packet %d\n", cur);		
-		ethr_init(&ethr, header, packet);
-		ethr_print(ethr);		
+		printf("\nPacket number: %d  Packet Len: %d\n", cur, header->caplen);
 		
-		if (ethr_type(ethr) == IP_TYPE_NO) {
-			ip_init(&ip, ethr_data(ethr), ethr_data_length(ethr));
-			ip_print(ip);
-			
-			if (ip_protocol(ip) == ICMP_PROTOCOL) {
-				
-				if (icmp(ip_data(ip)) == ECHO_REQUEST)
-					printf("      ICMP:       TYPE: ECHO_REQUEST\n" );
-				else if (icmp(ip_data(ip)) == ECHO_REPLY)
-					printf("      ICMP:       TYPE: ECHO_REPLY\n" );
-				else
-					printf("      ICMP:       Type: UNKNOWN");
+		// Read and remove ethernet header
+		next_type = ethr(header, packet, &pdu, &pdu_length);
+		
+		// Continue reading and removing headers until all that remains is a payload.
+		while (next_type != UNKNOWN && next_type != PAYLOAD) {
+			switch (next_type) {
+				case IP:
+					next_type = ip(&pdu, &pdu_length, &psuedo_header);
+					break;
+				case ARP:
+					next_type = arp(&pdu, &pdu_length);
+					break;
+				case UDP:
+					next_type = udp(&pdu, &pdu_length);
+					break;
+				case TCP:
+					next_type = tcp(&pdu, &pdu_length, &psuedo_header);
+					break;
+				case ICMP:
+					next_type = icmp(&pdu);
+					break;
 			}
-			else if (ip_protocol(ip) == TCP_PROTOCOL) {
-				tcp_init(&tcp, ip_data(ip), ip_psuedo_header(ip), ip_data_length(ip));
-				tcp_print(tcp);
-			}
-			else if (ip_protocol(ip) == UDP_PROTOCOL) {
-				udp_init(&udp, ip_data(ip), ip_data_length(ip));
-				udp_print(udp);
-			}
-			else
-				printf("Unknown protocol");
 		}
-		else if(ethr_type(ethr) == ARP_TYPE_NO) {
-			arp_init(&arp, ethr_data(ethr), ethr_data_length(ethr));
-			arp_print(arp);		
-		}
-		else
-			printf("Unknown type\n");
-
-		ethr_free(&ethr);
 		printf("\n");
 		cur++;
 	}
 	
-	
-	
 	return 0;
 }
 
-void printPacket(struct pcap_pkthdr *header, const u_char *packet) {
-	int i, count;
-	printf("Packet\n");
+int ethr(struct pcap_pkthdr *header, const u_char *packet, u_char **pdu, int *pdu_length)  {
+	int next_type;
+	struct ethr_obj *ethr;
 	
-	for (i = 0, count = 0; i < header->caplen; i++, count++) {
-		printf("%02X ", packet[i]);
-		
-		if (count == 16)
-			count = 0;
-		
-		if (count == 7)
-			printf(" ");
-		
-		if (count == 15)
-			printf("\n");
-	}
-	printf("\n");
+	next_type = UNKNOWN;
+	
+	ethr_init(&ethr, header, packet);
+	ethr_print2(ethr);
+	*pdu = ethr_data(ethr);
+	*pdu_length = ethr_data_length(ethr);
+	
+	if (ethr_type(ethr) == IP_TYPE_NO)
+		next_type = IP;
+	else if (ethr_type(ethr) == ARP_TYPE_NO)
+		next_type = ARP;
+	
+	ethr_free(&ethr);
+	
+	return next_type;
+}
+
+int ip(u_char **pdu, int *pdu_length, u_char **psuedo_header) {
+	struct ip_obj *ip;
+	int next_type;
+	
+	next_type = UNKNOWN;
+	
+	ip_init(&ip, *pdu, *pdu_length);
+	ip_print2(ip);
+	
+	
+	free(*pdu);
+	*pdu = ip_data(ip);
+	*pdu_length = ip_data_length(ip);
+	*psuedo_header = ip_psuedo_header(ip);
+	
+	if (ip_protocol(ip) == ICMP_PROTOCOL)
+		next_type = ICMP;
+	else if (ip_protocol(ip) == TCP_PROTOCOL)
+		next_type = TCP;
+	else if (ip_protocol(ip) == UDP_PROTOCOL)
+		next_type = UDP;
+	
+	ip_free(&ip);
+	
+	return next_type;
+}
+
+int arp(u_char **pdu, int *pdu_length) {
+	struct arp_obj *arp;
+	
+	arp_init(&arp, *pdu, *pdu_length);
+	arp_print2(arp);
+	free(*pdu);
+	
+	arp_free(&arp);
+	
+	return PAYLOAD;
+}
+
+int udp(u_char **pdu, int *pdu_length) {
+	struct udp_obj *udp;
+	
+	udp_init(&udp, *pdu, *pdu_length);
+	udp_print2(udp);
+	free(*pdu);
+	
+	udp_free(&udp);
+	
+	return PAYLOAD;
+}
+
+int tcp(u_char **pdu, int *pdu_length, u_char **psuedo_header) {
+	struct tcp_obj *tcp;
+	
+	tcp_init(&tcp, *pdu, *psuedo_header, *pdu_length);
+	tcp_print2(tcp);
+	free(*pdu);
+	free(*psuedo_header);
+	
+	tcp_free(&tcp);
+	
+	return PAYLOAD;
+}
+
+int icmp(u_char **pdu) {
+	printf("\n\tICMP Header");
+	if (icmp_type(*pdu) == ECHO_REQUEST)
+		printf("\n\t\tType: Request\n" );
+	else if (icmp_type(*pdu) == ECHO_REPLY)
+		printf("\n\t\tType: Reply\n" );
+	else
+		printf("\n\t\tType: Unknown\n" );
+	
+	free(*pdu);
+	
+	return PAYLOAD;
 }

@@ -55,8 +55,20 @@ void udp_print(udp_obj *this) {
 	
 }
 
+void udp_print2(udp_obj *this) {	
+	
+	printf("\n\tUDP Header");
+	printf("\n\t\tSource Port:  %d", this->src);	
+	printf("\n\t\tDest Port:  %d", this->dest);
+	
+	printf("\n");
+	
+}
+
 void udp_free(udp_obj **this) {
-	free((*this)->frame);
-	free(*this);
-	*this = NULL;
+	if (this && *this && (*this)->frame) {
+		free((*this)->frame);
+		free(*this);
+		*this = NULL;
+	}
 }

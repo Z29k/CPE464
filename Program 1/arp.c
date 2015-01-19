@@ -7,6 +7,8 @@
 #define ARP_MIN_SIZE 28
 #define IP_LENGTH 4
 #define MAC_LENGTH 6
+#define REQUEST 1
+#define REPLY 2
 
 typedef struct arp_obj
 {
@@ -46,11 +48,60 @@ int arp_init(arp_obj **to_init, u_char *packet, int size) {
 	return 0;
 }
 
+void arp_print2(arp_obj *this) {
+	int i;
+	
+	printf("\n\tARP header ");
+	printf("\n\t\tOpcode: ");
+	
+	if (this->opcode == REQUEST)
+		printf("Request");
+	else if (this->opcode == REPLY)
+		printf("Reply");
+
+	
+	printf("\n\t\tSender MAC: ");
+	
+	for (i = 0; i < MAC_LENGTH; i++) {
+		if (i)
+			printf(":");
+		printf("%x", (int)(this->src_mac[i]));
+	}
+	
+	printf("\n\t\tSender IP: ");
+	
+	for (i = 0; i < IP_LENGTH; i++) {
+		if (i)
+			printf(".");
+		printf("%d", (int)(this->src_ip[i]));
+	}
+	
+	printf("\n\t\tTarget MAC: ");
+	
+	for (i = 0; i < MAC_LENGTH; i++) {
+		if (i)
+			printf(":");
+		printf("%x", (int)(this->dest_mac[i]));
+	}
+	
+	printf("\n\t\tTarget IP: ");
+	
+	for (i = 0; i < IP_LENGTH; i++) {
+		if (i)
+			printf(".");
+		printf("%d", (int)(this->dest_ip[i]));
+	}
+	
+	printf("\n");
+	
+}
+
 void arp_print(arp_obj *this) {
 	int i;
 	
-	printf("   ARP Frame ");
-	printf("     opcode: %02X", this->opcode);
+	printf("   ARP header");
+	printf("    Opcode: %u", this->opcode);
+	
 	printf(" | Destination IP: ");
 	
 	for (i = 0; i < IP_LENGTH; i++) {
@@ -88,7 +139,9 @@ void arp_print(arp_obj *this) {
 }
 
 void arp_free(arp_obj **this) {
-	free((*this)->frame);
-	free(*this);
-	*this = NULL;
+	if (this && *this && (*this)->frame) {
+		free((*this)->frame);
+		free(*this);
+		*this = NULL;
+	}
 }

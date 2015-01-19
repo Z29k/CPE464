@@ -9,6 +9,7 @@ struct ip_obj;
 
 int ip_init(struct ip_obj **, u_char *, int);
 void ip_print(struct ip_obj *);
+void ip_print2(struct ip_obj *);
 void ip_free(struct ip_obj **);
 int ip_protocol(struct ip_obj *);
 u_char *ip_data(struct ip_obj *);

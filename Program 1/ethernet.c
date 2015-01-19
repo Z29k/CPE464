@@ -6,8 +6,8 @@
 #define MAC_LENGTH 6
 #define E_TYPE_BYTE 12
 #define E_FRAME_SIZE 14
-#define IP_TYPE_NO 1
-#define ARP_TYPE_NO 2
+#define IP_TYPE_NO 0x0800
+#define ARP_TYPE_NO 0x0806
 #define UNKNOWN_TYPE_NO 0
 
 
@@ -17,7 +17,7 @@ typedef struct ethr_obj
 	int frame_length;
    u_char dest[6];
    u_char src[6];
-   u_char type[2];
+   u_int16_t type;
 	u_char *data;
 	int data_length;
 } ethr_obj;
@@ -39,7 +39,7 @@ int ethr_init(ethr_obj **to_init, struct pcap_pkthdr *header, const u_char *pack
 
 	memcpy(this->src, this->frame + MAC_LENGTH, MAC_LENGTH);
 	
-	memcpy(this->type, this->frame + E_TYPE_BYTE, 2);
+	this->type = ntohs(((u_int16_t *)this->frame)[6]);
 	
 	this->data_length = this->frame_length - E_FRAME_SIZE;
 	this->data = calloc(this->data_length, sizeof(u_char));
@@ -70,7 +70,38 @@ void ethr_print(ethr_obj *this) {
 		printf("%02X", this->src[i]);
 	}
 	
-	printf(" | Type: %02x\n", this->type[1]);
+	printf(" | Type: %02x\n", this->type);
+	
+}
+
+void ethr_print2(ethr_obj *this) {
+	int i;
+	
+	printf("\n\tEthernet Header\n");
+	printf("\t\tDest MAC: ");
+	
+	for (i = 0; i < MAC_LENGTH; i++) {
+		if (i)
+			printf(":");
+		printf("%x", this->dest[i]);
+	}
+	
+	printf("\n\t\tSource MAC: ");
+	
+	for (i = 0; i < MAC_LENGTH; i++) {
+		if (i)
+			printf(":");
+		printf("%x", this->src[i]);
+	}
+	
+	printf("\n\t\tType: ");
+	if (this->type == IP_TYPE_NO)
+		printf("IP");
+	else if (this->type == ARP_TYPE_NO)
+		printf("ARP");
+	else 
+		printf("Unknown");
+	printf("\n");
 	
 }
 
@@ -87,13 +118,7 @@ int ethr_data_length(ethr_obj *this) {
 }
 
 int ethr_type(ethr_obj *this) {
-	if (this->type[0] == 0x08) {
-		if (this->type[1] == 0)
-			return IP_TYPE_NO;
-		else if (this->type[1] == 6)
-			return ARP_TYPE_NO;
-	}
-	return UNKNOWN_TYPE_NO;
+	return this->type;
 }
 
 void ethr_free(ethr_obj **this) {

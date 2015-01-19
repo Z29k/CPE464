@@ -4,6 +4,6 @@
 #define ECHO_REQUEST 8
 #define ECHO_REPLY 0
 
-int icmp(u_char *);
+int icmp_type(u_char *);
 
 #endif

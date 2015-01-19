@@ -8,7 +8,8 @@
 
 #define SYN_MASK 0x2
 #define FIN_MASK 0x1
-#define RST_MASK 0x0
+#define RST_MASK 0x4
+#define HTTP_PORT 80
 
 typedef struct tcp_obj
 {
@@ -72,17 +73,46 @@ void tcp_print(tcp_obj *this) {
 	this->flags & SYN_MASK ? printf(" | SYN : ON ") : printf(" | SYN : OFF");
 	this->flags & RST_MASK ? printf(" | RST : ON ") : printf(" | RST : OFF");
 	
-	/*
-	printf(" | Payload: ");
-	for(i = 0; i < this->frame_length; i++) {
-		printf("%02X", this->frame[i]);
-	}
-	*/
 	printf(" | Psuedo Header: ");
 	for(i = 0; i < 12; i++) {
 		printf("%02X", this->psuedo[i]);
 	}
 	
+	
+	printf("\n");
+	
+}
+
+void tcp_print2(tcp_obj *this) {
+	u_int16_t read_checksum;
+	
+	printf("\n\tTCP Header");
+	
+	if (this->src == HTTP_PORT)
+		printf("\n\t\tSource Port:  HTTP");
+	else
+		printf("\n\t\tSource Port: %u", this->src);
+	
+	if (this->dest == HTTP_PORT)
+		printf("\n\t\tDest Port:  HTTP");
+	else
+		printf("\n\t\tDest Port: %u", this->dest);
+	
+	printf("\n\t\tSequence Number: %u", this->seq);
+	printf("\n\t\tACK Number: %u", this->ack);
+	
+	this->flags & SYN_MASK ? printf("\n\t\tSYN Flag: Yes ") : printf("\n\t\tSYN Flag: No");
+	this->flags & RST_MASK ? printf("\n\t\tRST Flag: Yes ") : printf("\n\t\tRST Flag: No");
+	this->flags & FIN_MASK ? printf("\n\t\tFIN Flag: Yes ") : printf("\n\t\tFIN Flag: No");
+	
+	printf("\n\t\tWindow Size: %u", this->window);
+	
+	read_checksum = ntohs(((u_int16_t *)(this->frame))[8]);
+	
+	if (this->checksum)
+		printf("\n\t\tChecksum: Incorrect (0x%x)", read_checksum);
+	else
+		printf("\n\t\tChecksum: Correct (0x%x)", read_checksum);
 	
 	printf("\n");
 	
