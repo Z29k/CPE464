@@ -1,3 +1,9 @@
+/** Trace
+ *  Program 1 for CPE 464
+ *  Cal Poly
+ *  Author: Cody Jones
+ */
+
 #include <stdio.h>
 #include <pcap.h>
 #include <stdlib.h>
@@ -79,6 +85,8 @@ int main(int argc, char **argv) {
 					break;
 			}
 		}
+		if (next_type == UNKNOWN)
+			printf("Unknown PDU");
 		printf("\n");
 		cur++;
 	}

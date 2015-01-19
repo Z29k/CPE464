@@ -10,6 +10,11 @@
 #define FIN_MASK 0x1
 #define RST_MASK 0x4
 #define HTTP_PORT 80
+#define TELNET_PORT 23
+#define FTP_PORT 21
+#define POP_PORT 110
+#define SMTP_PORT 25
+#define SSH_PORT 22
 
 typedef struct tcp_obj
 {
@@ -88,15 +93,34 @@ void tcp_print2(tcp_obj *this) {
 	
 	printf("\n\tTCP Header");
 	
-	if (this->src == HTTP_PORT)
-		printf("\n\t\tSource Port:  HTTP");
-	else
-		printf("\n\t\tSource Port: %u", this->src);
+	printf("\n\t\tSource Port:  ");
 	
-	if (this->dest == HTTP_PORT)
-		printf("\n\t\tDest Port:  HTTP");
+	if (this->src == HTTP_PORT)
+		printf("HTTP");
+	else if (this->src == TELNET_PORT)
+		printf("Telnet");
+	else if (this->src == FTP_PORT)
+		printf("FTP");
+	else if (this->src == POP_PORT)
+		printf("POP3");
+	else if (this->src == SMTP_PORT)
+		printf("SMTP");
 	else
-		printf("\n\t\tDest Port: %u", this->dest);
+		printf("%u", this->src);
+	
+	printf("\n\t\tDest Port:  ");
+	if (this->dest == HTTP_PORT)
+		printf("HTTP");
+	else if (this->dest == TELNET_PORT)
+		printf("Telnet");
+	else if (this->dest == FTP_PORT)
+		printf("FTP");
+	else if (this->dest == POP_PORT)
+		printf("POP3");
+	else if (this->dest == SMTP_PORT)
+		printf("SMTP");
+	else
+		printf("%u", this->dest);
 	
 	printf("\n\t\tSequence Number: %u", this->seq);
 	printf("\n\t\tACK Number: %u", this->ack);
