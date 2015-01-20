@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pcap.h>
+#include <netinet/in.h>
 
 #define MAC_LENGTH 6
 #define E_TYPE_BYTE 12

@@ -119,7 +119,7 @@ int ip(u_char **pdu, int *pdu_length, u_char **psuedo_header) {
 	struct ip_obj *ip;
 	int next_type;
 	
-	next_type = UNKNOWN;
+	next_type = PAYLOAD;
 	
 	ip_init(&ip, *pdu, *pdu_length);
 	ip_print2(ip);
