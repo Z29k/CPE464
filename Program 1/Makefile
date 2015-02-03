@@ -10,27 +10,12 @@ CFLAGS = -g -Wall -Werror
 OS = $(shell uname -s)
 PROC = $(shell uname -p)
 EXEC_SUFFIX=$(OS)-$(PROC)
-
-ifeq ("$(OS)", "SunOS")
-	OSLIB=-L/opt/csw/lib -lsocket -lnsl
-	OSINC=-I/opt/csw/include
-	OSDEF=-DSOLARIS
-else
-ifeq ("$(OS)", "Darwin")
-	OSLIB=
-	OSINC=
-	OSDEF=-DDARWIN
-else
-	OSLIB=
-	OSINC=
-	OSDEF=-DLINUX
-endif
-endif
+CFILES = trace.c checksum.c ethernet.c ip.c arp.c icmp.c udp.c tcp.c
 
 all:  trace-$(EXEC_SUFFIX)
 
-trace-$(EXEC_SUFFIX): trace.c
-	$(CC) $(CFLAGS) $(OSINC) $(OSLIB) $(OSDEF) -lpcap -o $@ trace.c checksum.c
+trace-$(EXEC_SUFFIX): $(CFILES)
+	$(CC) $(CFLAGS) -lpcap -o trace $(CFILES)
 
 clean:
-	rm -f trace-*
+	rm trace
