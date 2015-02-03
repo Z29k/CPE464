@@ -1,0 +1,15 @@
+# TCP Chat makefile
+
+COMPILER = g++
+FLAGS = -Wall -Werror
+
+all:  cclient server
+
+cclient: cclient.cpp exceptions.h message.h message.cpp
+	$(COMPILER) $(FLAGS) cclient.cpp message.cpp -o cclient
+
+server: server.cpp exceptions.h message.h message.cpp
+	$(COMPILER) $(FLAGS) server.cpp message.cpp -o server
+
+clean:
+	rm cclient server
