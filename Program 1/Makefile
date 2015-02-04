@@ -6,15 +6,12 @@
 #  in your ~/.mybashrc file should do the trick
 
 CC = gcc
-CFLAGS = -g -Wall -Werror
-OS = $(shell uname -s)
-PROC = $(shell uname -p)
-EXEC_SUFFIX=$(OS)-$(PROC)
+CFLAGS = -Wall -Werror
 CFILES = trace.c checksum.c ethernet.c ip.c arp.c icmp.c udp.c tcp.c
 
-all:  trace-$(EXEC_SUFFIX)
+all:  trace
 
-trace-$(EXEC_SUFFIX): $(CFILES)
+trace: $(CFILES)
 	$(CC) $(CFLAGS) -lpcap -o trace $(CFILES)
 
 clean:

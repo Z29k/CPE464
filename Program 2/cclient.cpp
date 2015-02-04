@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
 	int socket_fd;
 	Message *msg;
 	int msg_size;
+	int error;
 	struct sockaddr_in server_address;
 	
 	try {
@@ -51,11 +52,36 @@ int main(int argc, char **argv) {
 	
 		if (connect(socket_fd, (struct sockaddr *)(&server_address), 16) == -1)
 			throw CONNECT_EX;
-	
 		
-		msg = new Message("Hello server!");
-		//msg_size = msg->pack();
-		//send(socket_fd, msg->sendable(), msg_size, 0);
+		msg = new Message();
+		msg->set_flag(1);
+		msg->set_from("cody", 4);
+		msg_size = msg->pack();
+		
+		error = send(socket_fd, msg->sendable(), msg_size, 0);
+		
+		if (error == -1)
+			throw SEND_EX;
+		
+		delete msg;
+		
+		msg = new Message("Hello server!\0");
+		msg->set_to("cody", 4);
+		msg->set_from("cody", 4);
+		msg_size = msg->pack();
+		
+		for (int i = 0; i < msg_size; i++) {
+			printf("%c", msg->sendable()[i]);
+		}
+		printf("\n");
+		
+		error = send(socket_fd, msg->sendable(), msg_size, 0);
+		
+		msg->print();
+		
+		if (error == -1) {
+			throw SEND_EX;
+		}
 	}
 	catch(int ex) {
 		if (ex == ARG_EX)
@@ -66,8 +92,14 @@ int main(int argc, char **argv) {
 			cout << "socket() failed. errno " << errno << "\n";
 		else if (ex == CONNECT_EX)
 			cout << "connect() failed. errno " << errno << "\n";
+		else if (ex == PACK_EX)
+			cout << "Message packing failed. errno " << errno << "\n";
+		else if (ex == UNPACK_EX)
+			cout << "Message unpacking failed. errno " << errno << "\n";
+		else if (ex == SEND_EX)
+			cout << "Message sending failed. errno " << errno << "\n";
 		else
-			cout << "Unknown exception.\n";
+			cout << "Unknown exception " << ex << "\n";
 	}
 }
 

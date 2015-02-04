@@ -14,6 +14,7 @@ class Message {
 	int text_length;
 	char *text;
 	uint8_t *bytes;
+	int total_length;
 	
 	public:
 	
@@ -24,19 +25,24 @@ class Message {
 	
 	void set_sequence_number(uint32_t number);
 	void set_flag(uint8_t flag);
-	void set_to(char *to, int length);
-	void set_from(char *from, int length);
-	void set_text(char *text, int length);
+	void set_to(const char *to, int length);
+	void set_from(const char *from, int length);
+	void set_text(const char *text, int length);
 	
 	uint32_t get_sequence_number();
 	uint8_t get_flag();
 	char *get_to();
+	int get_to_length();
 	char *get_from();
+	int get_from_length();
 	char *get_text();
 	int get_length();
+	int get_text_length();
 	
 	int pack();
 	uint8_t *sendable();
+
+	void print();
 	
 	private:
 	
