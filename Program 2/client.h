@@ -8,6 +8,7 @@ class Client {
 	int socket_fd;
 	struct sockaddr_in server_address;
 	bool exit;
+	int sequence_number;
 	
 public:
 	// Lifecycle
@@ -24,6 +25,8 @@ private:
 	void send_message(char *input);
 	void broadcast(char *input);
 	void list_handles();
+	int  request_list_length();
+	void request_handle(int index);
 };
 
 #endif

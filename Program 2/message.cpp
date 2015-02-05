@@ -9,6 +9,9 @@
 
 #define MIN_MESSAGE_SIZE 7
 
+/*
+ * Structors
+ */
 Message::Message() {
 	sequence_number = 0;
 	flag = 0;
@@ -52,8 +55,13 @@ Message::~Message() {
 	bytes = NULL;
 }
 
+/*
+ * Serialization functions
+ */
+
 int Message::pack() {
-		
+	uint32_t *pointer;
+	
 	total_length = MIN_MESSAGE_SIZE;
 	
 	total_length += to_length + from_length + text_length;
@@ -63,7 +71,8 @@ int Message::pack() {
 	
 	bytes = (uint8_t *)calloc(total_length, sizeof(uint8_t));
 	
-	bytes[0] = htonl(sequence_number);
+	pointer = (uint32_t *)bytes;
+	pointer[0] = htonl(sequence_number);
 	bytes[4] = flag;
 	bytes[5] = to_length;
 	
@@ -81,10 +90,6 @@ int Message::pack() {
 	return total_length;
 }
 
-uint8_t *Message::sendable() {
-	return bytes;
-}
-
 void Message::unpack() {
 	if (bytes == NULL)
 		throw UNPACK_EX;
@@ -96,7 +101,7 @@ void Message::unpack() {
 	if (text != NULL)
 		free(text);
 		
-	sequence_number = ntohl(bytes[0]);
+	sequence_number = ntohl(((uint32_t *)bytes)[0]);
 	flag = bytes[4];
 	
 	to_length = bytes[5];
@@ -114,8 +119,12 @@ void Message::unpack() {
 	
 }
 
+uint8_t *Message::sendable() {
+	return bytes;
+}
+
 /*
- * Setter methods
+ * Setter functions
  */
 void Message::set_sequence_number(uint32_t number) {
 	sequence_number = number;
@@ -152,8 +161,20 @@ void Message::set_text(const char *text, int length) {
 	memcpy(this->text, text, length);
 }
 
+void Message::set_int(int to_set) {
+	uint32_t *pointer;
+	
+	if (this->text != NULL)
+		free(this->text);
+	
+	text_length = 4;
+	text = (char *)calloc(4, sizeof(char));
+	pointer = (uint32_t *) text;
+	pointer[0] = htonl(to_set);	
+}
+
 /*
- * Getter methods
+ * Getter Functions
  */
 uint32_t Message::get_sequence_number() {
 	return sequence_number;
@@ -192,7 +213,7 @@ int Message::get_text_length() {
 }
 
 /*
- * Print functions
+ * Output Functions
  */
 void Message::print_bytes(char *bytes, int length) {
 	for (int i = 0; i < length; i++)

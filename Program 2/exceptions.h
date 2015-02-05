@@ -15,5 +15,9 @@
 #define HANDLE_EX 12
 #define MYSTERY_EX 13
 #define EXIT_EX 14
+#define LIST_EX 15
+#define PORT_EX 16
+#define HANDLE_LENGTH_EX 17
+#define MESSAGE_SIZE_EX 18
 
 #endif

@@ -15,6 +15,7 @@
 #include "message.h"
 #include "exceptions.h"
 #include "client.h"
+#include "config.h"
 
 #define ARG_EX 1
 #define IP_EX 2
@@ -33,12 +34,14 @@ Client::Client(char *handle, struct hostent *server, int port) {
 	this->handle = handle;
 	this->server = server;
 	this->port = port;
-	exit = false;
 }
 
 void Client::init() {
 	Message *msg;
 	int msg_size, error;	
+	
+	exit = false;
+	sequence_number = 0;
 	
 	server_address.sin_family = AF_INET;
 	server_address.sin_port = htons((short) port);
@@ -57,6 +60,7 @@ void Client::init() {
 	msg = new Message();
 	msg->set_flag(1);
 	msg->set_from(handle, strlen(handle));
+	msg->set_sequence_number(sequence_number++);
 	msg_size = msg->pack();
 	
 	error = send(socket_fd, msg->sendable(), msg_size, 0);
@@ -108,6 +112,7 @@ void Client::janitor() {
 	msg->set_from(handle, strlen(handle));
 	msg_size = msg->pack();
 	
+	msg->set_sequence_number(sequence_number++);
 	error = send(socket_fd, msg->sendable(), msg_size, 0);
 	
 	if (error == -1)
@@ -174,32 +179,38 @@ void Client::process_user_input() {
 	char sel;
 	
 	fgets(input_buffer, BUFFER_SIZE, stdin);
-	
-	if (strlen(input_buffer) > 1) {
-		input_buffer[0] == '%' ? sel = input_buffer[1] : sel = input_buffer[0];
+	try {
+		if (strlen(input_buffer) > 1) {
+			input_buffer[0] == '%' ? sel = input_buffer[1] : sel = input_buffer[0];
 			
-		if (sel == 'm' || sel == 'M') {
-			send_message(input_buffer);
+			if (sel == 'm' || sel == 'M') {
+				send_message(input_buffer);
+			}
+			else if (sel == 'b' || sel == 'B') {
+				broadcast(input_buffer);
+			}
+			else if (sel == 'l' || sel == 'L') {
+				list_handles();
+			}
+			else if (sel == 'e' || sel == 'E') {
+				exit = true;
+			}
+			else {
+				printf("M - message\n");
+				printf("B - broadcast\n");
+				printf("L - list\n");
+				printf("E - exit\n");
+			}
 		}
-		else if (sel == 'b' || sel == 'B') {
-			broadcast(input_buffer);
-		}
-		else if (sel == 'l' || sel == 'L') {
-			list_handles();
-		}
-		else if (sel == 'e' || sel == 'E') {
-			exit = true;
-		}
-		else {
-			printf("M - message\n");
-			printf("B - broadcast\n");
-			printf("L - list\n");
-			printf("E - exit\n");
-		}
+		else
+			printf("%%<option> <handle> <message>\n");
 	}
-	else
-		printf("%%<option> <handle> <message>\n");
-	
+	catch (int ex) {
+		if (ex == MESSAGE_SIZE_EX) 
+			printf("Messages must be under 1000 characters.\n");
+		else
+			throw ex;
+	}
 	printf("> ");
 	fflush(stdout);
 }
@@ -229,7 +240,7 @@ void Client::process_message() {
 	else if (flag == 7) {
 		memcpy(handle, msg->get_to(), msg->get_to_length());
 		handle[msg->get_to_length()] = '\0';
-		printf("The handle %s does not exist.\n", handle);
+		printf("Client with handle %s does not exist.\n", handle);
 	}
 	
 	delete msg;
@@ -255,6 +266,9 @@ void Client::send_message(char *input) {
 	
 	message_start = strstr(input, to) + strlen(to) + 1;
 	
+	if (strlen(message_start) > MAX_MESSAGE_SIZE)
+		throw MESSAGE_SIZE_EX;
+	
 	for (message_size = 0; message_start[message_size] != '\0'; message_size++);
 	
 	msg = new Message();
@@ -267,6 +281,7 @@ void Client::send_message(char *input) {
 		msg->set_text(message_start, message_size);
 	
 	msg->set_flag(6);
+	msg->set_sequence_number(sequence_number++);
 	message_size = msg->pack();
 	
 	error = send(socket_fd, msg->sendable(), message_size, 0);
@@ -287,12 +302,22 @@ void Client::broadcast(char *input) {
 	
 	message_start = input + strlen(garbage) + 1;
 	
+	if (strlen(message_start) > MAX_MESSAGE_SIZE)
+		throw MESSAGE_SIZE_EX;
+	
 	for (message_size = 0; message_start[message_size] != '\0'; message_size++);
 	
 	msg = new Message();
 	msg->set_from(handle, strlen(handle));
 	msg->set_text(message_start, message_size);
+	
+	if (message_size == 0)
+		msg->set_text("\n", 1);
+	else
+		msg->set_text(message_start, message_size);
+		
 	msg->set_flag(6);
+	msg->set_sequence_number(sequence_number++);
 	message_size = msg->pack();
 	
 	error = send(socket_fd, msg->sendable(), message_size, 0);
@@ -302,6 +327,87 @@ void Client::broadcast(char *input) {
 }
 
 void Client::list_handles() {
+	int list_length;
+	
+	list_length = request_list_length();	
+	
+	for (int i = 0; i < list_length; i++)
+		request_handle(i);
+}
+	
 
+int Client::request_list_length() {
+	Message *msg;
+	uint8_t buffer[BUFFER_SIZE];
+	int msg_size, error, flag, length;
+
+	//Request list length from server, flag 10
+	msg = new Message();
+	msg->set_flag(10);
+	msg->set_from(handle, strlen(handle));
+	msg->set_sequence_number(sequence_number++);
+	msg_size = msg->pack();
+	
+	error = send(socket_fd, msg->sendable(), msg_size, 0);
+	
+	if (error == -1)
+		throw SEND_EX;
+	
+	delete msg;
+	
+	//Get list length from server
+	msg_size = recv(socket_fd, buffer, BUFFER_SIZE, 0);
+	
+	// Connection lost ?
+	if (msg_size == 0)
+		throw CONNECT_EX;
+	
+	msg = new Message(buffer, msg_size);
+	flag = msg->get_flag();
+	length = ntohl(((uint32_t *)msg->get_text())[0]);
+	delete msg;
+
+	// Check Flag for 11
+	if (flag != 11)
+		throw LIST_EX;
+		
+	return length;
+}
+
+void Client::request_handle(int index) {
+	Message *msg;
+	uint8_t buffer[BUFFER_SIZE];
+	int msg_size, error, flag;
+
+	//Request list length from server, flag 12
+	msg = new Message();
+	msg->set_flag(12);
+	msg->set_from(handle, strlen(handle));
+	msg->set_int(index);
+	msg->set_sequence_number(sequence_number++);
+	msg_size = msg->pack();
+	
+	error = send(socket_fd, msg->sendable(), msg_size, 0);
+	
+	if (error == -1)
+		throw SEND_EX;
+	
+	delete msg;
+	
+	//Get list length from server
+	msg_size = recv(socket_fd, buffer, BUFFER_SIZE, 0);
+	// Connection lost ?
+	if (msg_size == 0)
+		throw CONNECT_EX;
+	
+	msg = new Message(buffer, msg_size);
+	flag = msg->get_flag();
+	msg->print();
+	delete msg;
+
+	// Check Flag for 13
+	if (flag != 13)
+		throw LIST_EX;
+	
 }
 

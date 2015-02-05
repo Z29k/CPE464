@@ -5,7 +5,7 @@
 
 class Server {
 	
-	int answering_machine; // socket to linsten() on
+	int answering_machine; // socket to listen() on
 	int current_socket;
 	int *open_sockets; // open connections to clients
 	char **clients; // array of client handles
@@ -18,6 +18,7 @@ class Server {
 	int port;
 	struct sockaddr_in address;
 	int unconfirmed_clients;
+	int sequence_number;
 	
 public: // Lifecycle
 	Server(int argc, char **argv);
@@ -26,8 +27,12 @@ public: // Lifecycle
 	void shutdown();
 	
 private: 
+	// Packets
+	void process_packet(int fd);	
+	void initial_packet(int fd, Message *msg);
+	void message_packet(int fd, Message *msg, int msg_size);
+	
 	// Workflow
-	void process_packet(int fd);
 	void answer();
 	void learn_handle(int fd, char *handle, int length);
 	void broadcast(Message *msg, int msg_size);
@@ -36,6 +41,8 @@ private:
 	// Responses to client
 	void confirm_handle(char *to, int to_length);
 	void bad_handle_response(int fd, char *handle, int length);
+	void list_length_response(int fd);
+	void handle_request_response(int fd, Message *client_msg);
 	void bad_destination_response(int fd, char *handle, int length);
 	void exit_response(int fd);
 	

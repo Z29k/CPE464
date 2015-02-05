@@ -11,6 +11,7 @@
 #include "message.h"
 #include "exceptions.h"
 #include "client.h"
+#include "config.h"
 
 #define ARG_EX 1
 #define IP_EX 2
@@ -32,6 +33,9 @@ int main(int argc, char **argv) {
 		handle = argv[1];
 		server = gethostbyname(argv[2]);
 		stringstream(argv[3]) >> port;
+		
+		if (strlen(handle) > MAX_HANDLE_SIZE)
+			throw HANDLE_LENGTH_EX;
 	
 		if (server == NULL)
 			throw IP_EX;
@@ -58,6 +62,8 @@ int main(int argc, char **argv) {
 			cout << "Message sending failed. errno " << errno << "\n";
 		else if (ex == HANDLE_EX)
 			cout << "Handle " << handle << " is already taken.\n";
+		else if (ex == HANDLE_LENGTH_EX)
+			cout << "Handles must be under 100 characters.\n";
 		else
 			cout << "Unknown exception " << ex << "\n";
 	}
