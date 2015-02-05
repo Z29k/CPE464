@@ -36,7 +36,7 @@ private:
 	// Responses to client
 	void confirm_handle(char *to, int to_length);
 	void bad_handle_response(int fd, char *handle, int length);
-	void bad_destination_response(int fd, char *handle, int length);
+	void bad_destination_response(char *handle, int length);
 	void exit_response(int fd);
 	
 	// Utility

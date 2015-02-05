@@ -192,16 +192,21 @@ int Message::get_text_length() {
 }
 
 /*
- * Debuggery
+ * Print functions
  */
-
-void print_bytes(char *bytes, int length) {
+void Message::print_bytes(char *bytes, int length) {
 	for (int i = 0; i < length; i++)
 		printf("%c", bytes[i]);
 }
 
 
 void Message::print() {
+	print_bytes(from, from_length);
+	printf(": ");
+	print_bytes(text, text_length);
+}
+
+void Message::print_full() {
 	printf("Message\n");
 	printf("   sequence_number %d\n", sequence_number);
 	printf("              flag %d\n", flag);

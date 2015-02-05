@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 		else if (ex == ACCEPT_EX)
 			cout << "accept(), errno "  << errno << "\n";
 		else if (ex == SEND_EX)
-			cout << "send(), errno "  << errno << "\n";
+			cout << "accept(), errno "  << errno << "\n";
 		else
 			cout << "Unknown exception.\n";
 	}

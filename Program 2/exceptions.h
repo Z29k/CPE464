@@ -13,5 +13,7 @@
 #define LISTEN_EX 10
 #define ACCEPT_EX 11
 #define HANDLE_EX 12
+#define MYSTERY_EX 13
+#define EXIT_EX 14
 
 #endif

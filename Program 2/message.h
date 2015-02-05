@@ -42,10 +42,11 @@ class Message {
 	int pack();
 	uint8_t *sendable();
 
+	void print_full();
 	void print();
-	
 	private:
 	
+	void print_bytes(char *bytes, int length);
 	void unpack();
 };
 
