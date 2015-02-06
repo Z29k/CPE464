@@ -22,7 +22,7 @@ private:
 	void confirm_handle();
 	void process_message();
 	void process_user_input();
-	void send_message(char *input);
+	int send_message(char *input);
 	void broadcast(char *input);
 	void list_handles();
 	int  request_list_length();

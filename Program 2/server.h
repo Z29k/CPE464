@@ -43,6 +43,7 @@ private:
 	void bad_handle_response(int fd, char *handle, int length);
 	void list_length_response(int fd);
 	void handle_request_response(int fd, Message *client_msg);
+	void bad_handle_request_response(int fd, Message *client_msg);
 	void bad_destination_response(int fd, char *handle, int length);
 	void exit_response(int fd);
 	

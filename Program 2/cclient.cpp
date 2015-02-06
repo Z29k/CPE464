@@ -177,6 +177,9 @@ void Client::confirm_handle() {
 void Client::process_user_input() {
 	char input_buffer[BUFFER_SIZE];
 	char sel;
+	int sent_to_self;
+	
+	sent_to_self = 0; //a flag which lets us know whether or not to print out the prompt
 	
 	fgets(input_buffer, BUFFER_SIZE, stdin);
 	try {
@@ -184,7 +187,7 @@ void Client::process_user_input() {
 			input_buffer[0] == '%' ? sel = input_buffer[1] : sel = input_buffer[0];
 			
 			if (sel == 'm' || sel == 'M') {
-				send_message(input_buffer);
+				sent_to_self = send_message(input_buffer);
 			}
 			else if (sel == 'b' || sel == 'B') {
 				broadcast(input_buffer);
@@ -211,8 +214,11 @@ void Client::process_user_input() {
 		else
 			throw ex;
 	}
-	printf("> ");
-	fflush(stdout);
+	
+	if (!sent_to_self) {
+		printf("> ");
+		fflush(stdout);
+	}
 }
 
 void Client::process_message() {
@@ -251,25 +257,28 @@ void Client::process_message() {
 
 }
 
-void Client::send_message(char *input) {
+int Client::send_message(char *input) {
 	char to[101];
 	int to_length;
 	char garbage[100];
 	char *message_start;
 	int message_size;
 	Message *msg;
-	int error;
-	
+	int error, sent_to_self;
 	
 	sscanf(input, "%s %100s", garbage, to);
 	to_length = strlen(to);
 	
 	message_start = strstr(input, to) + strlen(to) + 1;
 	
+	sent_to_self = (strcmp(to, handle) == 0);
+	
 	if (strlen(message_start) > MAX_MESSAGE_SIZE)
 		throw MESSAGE_SIZE_EX;
 	
 	for (message_size = 0; message_start[message_size] != '\0'; message_size++);
+	
+	message_size++;
 	
 	msg = new Message();
 	msg->set_to(to, to_length);
@@ -288,6 +297,8 @@ void Client::send_message(char *input) {
 	
 	if (error == -1)
 		throw SEND_EX;
+		
+	return sent_to_self;
 }
 
 void Client::broadcast(char *input) {
@@ -297,15 +308,17 @@ void Client::broadcast(char *input) {
 	Message *msg;
 	int error;
 	
-	
 	sscanf(input, "%s", garbage);
 	
 	message_start = input + strlen(garbage) + 1;
+	
 	
 	if (strlen(message_start) > MAX_MESSAGE_SIZE)
 		throw MESSAGE_SIZE_EX;
 	
 	for (message_size = 0; message_start[message_size] != '\0'; message_size++);
+	
+	message_size++;
 	
 	msg = new Message();
 	msg->set_from(handle, strlen(handle));
@@ -377,9 +390,11 @@ int Client::request_list_length() {
 void Client::request_handle(int index) {
 	Message *msg;
 	uint8_t buffer[BUFFER_SIZE];
+	char *incoming_handle;
+	uint8_t handle_length;
 	int msg_size, error, flag;
 
-	//Request list length from server, flag 12
+	//Request handle with index
 	msg = new Message();
 	msg->set_flag(12);
 	msg->set_from(handle, strlen(handle));
@@ -394,7 +409,6 @@ void Client::request_handle(int index) {
 	
 	delete msg;
 	
-	//Get list length from server
 	msg_size = recv(socket_fd, buffer, BUFFER_SIZE, 0);
 	// Connection lost ?
 	if (msg_size == 0)
@@ -402,12 +416,24 @@ void Client::request_handle(int index) {
 	
 	msg = new Message(buffer, msg_size);
 	flag = msg->get_flag();
-	msg->print();
+	incoming_handle = msg->get_text();
+	
 	delete msg;
 
 	// Check Flag for 13
-	if (flag != 13)
-		throw LIST_EX;
+	if (flag == 13) {
 	
+		handle_length = incoming_handle[0];
+	
+		for (int i = 1; i <= handle_length; i++)
+			printf("%c", incoming_handle[i]);
+		
+		printf("\n");
+	}
+	else if (flag == 14) {
+	
+	}
+	else
+		throw LIST_EX;
 }
 

@@ -116,11 +116,9 @@ void Server::shutdown() {
  */ 
  
 void Server::process_packet(int fd) {
-	uint8_t *buffer;
+	uint8_t buffer[BUFFER_SIZE];
 	int message_size, flag;
 	Message *msg;
-
-	buffer = (uint8_t *) calloc(BUFFER_SIZE, sizeof(uint8_t));
 
 	message_size = recv(fd, buffer, BUFFER_SIZE, 0);
 
@@ -142,17 +140,26 @@ void Server::process_packet(int fd) {
 			list_length_response(fd);
 		}
 		else if (flag == 12) {
-			handle_request_response(fd, msg);
+			try {
+				handle_request_response(fd, msg);
+			}
+			catch (int ex) {
+				if (ex == LIST_EX)
+					bad_handle_request_response(fd, msg);
+				else
+					throw ex;
+			}
 		}
 		
+		
+		delete msg;
 	}
 	// Connection closed externally
-	else
+	else {
+		//printf("Client dropped!\n");
 		close_connection(fd);
+	}
 	
-	
-	delete msg;
-	free(buffer);
 }
 
 void Server::initial_packet(int fd, Message *msg) {
@@ -162,7 +169,7 @@ void Server::initial_packet(int fd, Message *msg) {
 	}
 	catch (int ex) {
 		if (ex == HANDLE_EX) {
-			printf("Handle is null or already exists\n");
+			//printf("Handle is null or already exists\n");
 			bad_handle_response(fd, msg->get_from(), msg->get_from_length());
 		}
 		else 
@@ -354,24 +361,41 @@ void Server::list_length_response(int fd) {
 void Server::handle_request_response(int fd, Message *client_msg) {
 	Message *msg;
 	int error, msg_size, index;
-	char handle[MAX_HANDLE_SIZE + 1];
+	char handle[MAX_HANDLE_SIZE + 2];
 	int handle_length;
 	
 	index = ntohl(((uint32_t *)client_msg->get_text())[0]);
 	
-	if (index < 0 || index > num_open)
+	if (index < 0 || index > num_open) 
 		throw LIST_EX;
 	
-	strcpy(handle, clients[index]);
-	handle_length = strlen(handle);
-	handle[handle_length] = '\n';
-	handle[handle_length+1] = '\0';
+	strcpy(handle+1, clients[index]);
+	handle_length = strlen(handle+1);
+	handle[0] = handle_length;
 	
-	printf("Sending handle %s", handle);
+	//printf("Sending handle %s", handle);
 	msg = new Message();
 	msg->set_from("Server", 6);
 	msg->set_flag(13);
 	msg->set_text(handle, handle_length + 1);
+	msg->set_sequence_number(sequence_number++);
+	msg_size = msg->pack();
+		
+	error = send(fd, msg->sendable(), msg_size, 0);
+		
+	if (error == -1) {
+		throw SEND_EX;
+	}
+
+	delete msg;
+}
+
+void Server::bad_handle_request_response(int fd, Message *client_msg) {
+	Message *msg;
+	int error, msg_size;
+	
+	msg = new Message();
+	msg->set_flag(14);
 	msg->set_sequence_number(sequence_number++);
 	msg_size = msg->pack();
 		

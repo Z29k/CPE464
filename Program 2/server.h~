@@ -18,6 +18,7 @@ class Server {
 	int port;
 	struct sockaddr_in address;
 	int unconfirmed_clients;
+	int sequence_number;
 	
 public: // Lifecycle
 	Server(int argc, char **argv);

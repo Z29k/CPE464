@@ -8,6 +8,7 @@ class Client {
 	int socket_fd;
 	struct sockaddr_in server_address;
 	bool exit;
+	int sequence_number;
 	
 public:
 	// Lifecycle
