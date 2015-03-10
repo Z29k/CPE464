@@ -105,6 +105,8 @@ int32_t select_call(int32_t socket_num, int32_t seconds, int32_t microseconds, i
 		exit(-1);
 	}
 	
+	free(timeout); //I added
+	
 	if (FD_ISSET(socket_num, &fdvar)) 
 		return 1;
 	else

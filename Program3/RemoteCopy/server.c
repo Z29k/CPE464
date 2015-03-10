@@ -22,6 +22,8 @@
 
 #include "networks.h"
 #include "cpe464.h"
+#include "window.h"
+#include "packet.h"
 
 typedef enum State STATE;
 
@@ -32,7 +34,7 @@ enum State {
 void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Connection *client);
 
 STATE filename(Connection *client, uint8_t *buf, int32_t recv_len, int32_t *data_file, 
-	int32_t *bufsize);
+	int32_t *bufsize, Window *window);
 
 STATE send_data(Connection *client, uint8_t *packet, int32_t *packet_len, int32_t data_file, 
 	int32_t buf_size, int32_t *seq_num);
@@ -97,6 +99,7 @@ void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Conne
 	uint8_t packet[MAX_LEN];
 	int32_t buf_size = 0;
 	int32_t seq_num = START_SEQ_NUM;
+	Window window;
 	
 	while (state != DONE) {
 		
@@ -108,7 +111,7 @@ void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Conne
 			
 			case FILENAME:
 				seq_num = 1;
-				state = filename(client, buf, recv_len, &data_file, &buf_size);
+				state = filename(client, buf, recv_len, &data_file, &buf_size, &window);
 				break;
 				
 			case SEND_DATA:
@@ -135,7 +138,7 @@ void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Conne
 }
 
 STATE filename(Connection *client, uint8_t *buf, int32_t recv_len, int32_t *data_file,
-	int32_t *buf_size) {
+	int32_t *buf_size, Window *window) {
 
 	uint8_t response[1];
 	char fname[MAX_LEN];

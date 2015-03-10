@@ -19,6 +19,8 @@
 
 #include "networks.h"
 #include "cpe464.h"
+#include "window.h"
+#include "packet.h"
 
 typedef enum State STATE;
 
@@ -26,8 +28,8 @@ enum State {
 	DONE, FILENAME, RECV_DATA, FILE_OK
 };
 
-STATE filename(char * fname, int32_t buf_size);
-STATE recv_data(int32_t output_file);
+STATE filename(char * fname, int32_t buf_size, Window *window);
+STATE recv_data(int32_t output_file, Window *window);
 void check_args(int argc, char **argv);
 
 Connection server;
@@ -35,11 +37,14 @@ Connection server;
 int main(int argc, char **argv) {
 	int32_t output_file = 0;
 	int32_t select_count = 0;
+	Window window;
 	STATE state = FILENAME;
 	
 	check_args(argc, argv);
 	
 	sendtoErr_init(atof(argv[4]), DROP_ON, FLIP_ON, DEBUG_ON, RSEED_ON);
+	
+	initWindow(&window, atoi(argv[5]));
 	
 	state = FILENAME;
 	
@@ -51,7 +56,7 @@ int main(int argc, char **argv) {
 				if (udp_client_setup(argv[6], atoi(argv[7]), &server) < 0)
 					exit(-1);
 				
-				state = filename(argv[1], atoi(argv[3]));
+				state = filename(argv[1], atoi(argv[3]), &window);
 				
 				/*if no response from server then repeat sending filename (close socket_ so you can open another */
 				if (state == FILENAME)
@@ -77,7 +82,7 @@ int main(int argc, char **argv) {
 				break;
 				
 			case RECV_DATA:
-				state = recv_data(output_file);
+				state = recv_data(output_file, &window);
 				break;
 				
 			case DONE:
@@ -91,7 +96,7 @@ int main(int argc, char **argv) {
 	return 0;
 }
 	
-STATE filename(char *fname, int32_t buf_size) {
+STATE filename(char *fname, int32_t buf_size, Window *window) {
 	uint8_t packet[MAX_LEN];
 	uint8_t buf[MAX_LEN];
 	uint8_t flag = 0;
@@ -124,7 +129,7 @@ STATE filename(char *fname, int32_t buf_size) {
 	return FILENAME;
 }
 
-STATE recv_data(int32_t output_file) {
+STATE recv_data(int32_t output_file, Window *window) {
 	int32_t seq_num = 0;
 	uint8_t flag = 0;
 	int32_t data_len = 0;
@@ -136,6 +141,8 @@ STATE recv_data(int32_t output_file) {
 		printf("Timeout after 10 seconds, client done.\n");
 		return DONE;
 	}
+	
+	window->bottom = expected_seq_num;
 	
 	data_len = recv_buf(data_buf, 1400, server.sk_num, &server, &flag, &seq_num);
 	
@@ -151,7 +158,7 @@ STATE recv_data(int32_t output_file) {
 		return DONE;
 	}
 	
-	if (seq_num == expected_seq_num) {
+	if (seq_num == window->bottom) {
 		expected_seq_num++;
 		write(output_file, &data_buf, data_len);
 	}
