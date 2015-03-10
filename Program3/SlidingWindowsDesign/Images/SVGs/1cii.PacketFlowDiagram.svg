@@ -1,0 +1,680 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="585"
+   height="675"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="1cii.PacketFlowDiagram.svg"
+   inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1cii.PacketFlowDiagram.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="167.98136"
+     inkscape:cy="379.80485"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="in"
+     inkscape:window-width="1855"
+     inkscape:window-height="1056"
+     inkscape:window-x="65"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     height="4.5in" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-377.35975)">
+    <text
+       xml:space="preserve"
+       style="font-size:32px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="72.250931"
+       y="416.70178"
+       id="text3004"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3006"
+         x="72.250931"
+         y="416.70178"
+         style="font-size:20px">rcopy</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:32px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="459.67453"
+       y="420.57874"
+       id="text3008"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3010"
+         x="459.67453"
+         y="420.57874"
+         style="font-size:20px">server</tspan></text>
+    <g
+       id="g3016"
+       transform="matrix(-1,0,0,1,597.87833,-302.7665)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.99999988px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 101.54064,431.93703 0,434.67277"
+       id="path3020"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.99999988px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 493.54074,431.93704 0,434.6726"
+       id="path3020-9"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="369.37753"
+       y="441.75305"
+       id="text3059"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3061"
+         x="369.37753"
+         y="441.75305">filename</tspan></text>
+    <g
+       id="g3016-9"
+       transform="translate(-1.1313442,-275.9115)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-8"
+         d="M 117.25403,765.4432 482.03169,752.70488"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-2"
+         d="m 124.22629,762.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="237.40515"
+       y="476.10266"
+       id="text3059-7"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3061-0"
+         x="237.40515"
+         y="476.10266">filename ACK</tspan></text>
+    <g
+       id="g5174">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+         transform="matrix(0.99939083,-0.0348995,0.0348995,0.99939083,-27.656835,-202.80667)"
+         id="g3016-2-9">
+        <path
+           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="M 117.25403,759.4432 482.03169,746.70488"
+           id="path3012-4-7"
+           inkscape:connector-curvature="0" />
+        <path
+           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+           id="path3014-6-9"
+           inkscape:connector-curvature="0" />
+      </g>
+    </g>
+    <g
+       id="g3016-2-9-4"
+       transform="matrix(0.83223406,-0.0348995,0.02906226,0.99939083,58.418434,-229.89863)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-4-7-0"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1.09583437px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-6-9-9"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1.09583437px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <g
+       id="g3016-2-9-3"
+       transform="matrix(0.79425436,-0.02773598,0.02773598,0.79425436,77.735199,-20.517777)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-4-7-9"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1.25827551px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-6-9-0"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1.25827551px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="266.73669"
+       y="504.73279"
+       id="text3600"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3602"
+         x="266.73669"
+         y="504.73279">D1</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="266.77966"
+       y="534.4809"
+       id="text3600-4"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3602-0"
+         x="266.77966"
+         y="534.4809">D2</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="266.66956"
+       y="563.71442"
+       id="text3600-6"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3602-5"
+         x="266.66956"
+         y="563.71442">D3</tspan></text>
+    <g
+       id="g3016-2-9-4-6"
+       transform="matrix(0.99939083,-0.0348995,0.0348995,0.99939083,-28.898136,38.213784)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-4-7-0-4"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-6-9-9-3"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="266.57556"
+       y="779.48322"
+       id="text3600-1-0"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3602-2-95"
+         x="266.57556"
+         y="779.48322">D6</tspan></text>
+    <g
+       id="g3016-3-3-4"
+       transform="matrix(-1,0,0,1,596.76253,57.60223)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-0-9-4"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-9-63-6"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="381.85727"
+       y="749.37335"
+       id="text3713-4-8"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3715-7-5"
+         x="381.85727"
+         y="749.37335">RR6</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="382.70322"
+       y="810.56482"
+       id="text3713-8-4"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3715-3-2"
+         x="382.70322"
+         y="810.56482">BYE</tspan></text>
+    <g
+       id="g3016-2-9-4-6-2"
+       transform="matrix(0.99939083,-0.0348995,0.0348995,0.99939083,-29.608905,94.27147)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-4-7-0-4-3"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-6-9-9-3-8"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="264.00549"
+       y="834.28552"
+       id="text3713-8-4-4"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3715-3-2-3"
+         x="264.00549"
+         y="834.28552">BYE</tspan></text>
+    <path
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       d=""
+       id="path4005"
+       inkscape:connector-curvature="0"
+       transform="translate(0,647.35975)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       d=""
+       id="path4007"
+       inkscape:connector-curvature="0"
+       transform="translate(0,647.35975)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       d=""
+       id="path4009"
+       inkscape:connector-curvature="0"
+       transform="translate(0,647.35975)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       d=""
+       id="path4011"
+       inkscape:connector-curvature="0"
+       transform="translate(0,647.35975)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <g
+       id="g4821"
+       transform="translate(20.708127,-280.98985)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3985"
+         d="m 149.75512,795.52846 19.69797,19.69798"
+         style="fill:#ff0000;fill-opacity:1;stroke:#d90000;stroke-width:2.9000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3985-3"
+         d="m 169.45309,795.52846 -19.69797,19.69797"
+         style="fill:#ff0000;fill-opacity:1;stroke:#d90000;stroke-width:2.9000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <g
+       id="g3016-3-8-9-8"
+       transform="matrix(-1,0,0,1,598.01506,-180.51579)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-0-1-2-6"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-9-2-0-1"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="378.18344"
+       y="573.37433"
+       id="text3600-8"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         x="378.18344"
+         y="573.37433"
+         id="tspan4870">NAK1</tspan></text>
+    <g
+       id="g3016-3-3-2"
+       transform="matrix(-1,0,0,1,597.89882,-2.3950321)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-0-9-1"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-9-63-4"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <g
+       id="g4821-4"
+       transform="translate(32.538753,-226.73199)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3985-5"
+         d="m 149.75512,795.52846 19.69797,19.69798"
+         style="fill:#ff0000;fill-opacity:1;stroke:#d90000;stroke-width:2.9000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3985-3-8"
+         d="m 169.45309,795.52846 -19.69797,19.69797"
+         style="fill:#ff0000;fill-opacity:1;stroke:#d90000;stroke-width:2.9000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <g
+       id="g3016-3-8-9-8-2"
+       transform="matrix(-1,0,0,1,598.79055,-59.40867)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-0-1-2-6-5"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-9-2-0-1-3"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="378.1163"
+       y="693.48145"
+       id="text3600-8-7"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         x="378.1163"
+         y="693.48145"
+         id="tspan4870-0">NAK3</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="266.53796"
+       y="661.66394"
+       id="text3600-4-2"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3602-0-1"
+         x="266.53796"
+         y="661.66394">D4</tspan></text>
+    <g
+       id="g3016-2-9-6"
+       transform="matrix(0.99939083,-0.0348995,0.0348995,0.99939083,-26.675334,-79.183567)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-4-7-33"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-6-9-7"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="266.73669"
+       y="596.86926"
+       id="text3600-7"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3602-53"
+         x="266.73669"
+         y="596.86926">D1</tspan></text>
+    <g
+       transform="translate(1.052929,59.765961)"
+       id="g5174-9">
+      <g
+         inkscape:export-ydpi="90"
+         inkscape:export-xdpi="90"
+         inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+         transform="matrix(0.99939083,-0.0348995,0.0348995,0.99939083,-27.656835,-202.80667)"
+         id="g3016-2-9-08">
+        <path
+           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="M 117.25403,759.4432 482.03169,746.70488"
+           id="path3012-4-7-6"
+           inkscape:connector-curvature="0" />
+        <path
+           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+           id="path3014-6-9-2"
+           inkscape:connector-curvature="0" />
+      </g>
+    </g>
+    <g
+       id="g3016-3-6-8"
+       transform="matrix(-1,0,0,1,600.50484,-119.07666)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-0-0-8"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-9-1-0"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="381.95126"
+       y="635.33435"
+       id="text3713-9-2"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3715-4-1"
+         x="381.95126"
+         y="635.33435">RR3</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="266.70984"
+       y="685.30676"
+       id="text3600-4-2-4"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3602-0-1-4"
+         x="266.70984"
+         y="685.30676">D5</tspan></text>
+    <g
+       id="g3016-2-9-6-3"
+       transform="matrix(0.99939083,-0.0348995,0.0348995,0.99939083,-27.603906,-55.540709)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-4-7-33-8"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-6-9-7-6"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:11px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="266.66956"
+       y="719.86389"
+       id="text3600-6-1"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan3602-5-4"
+         x="266.66956"
+         y="719.86389">D3</tspan></text>
+    <g
+       id="g3016-2-9-6-3-1"
+       transform="matrix(0.99939083,-0.0348995,0.0348995,0.99939083,-26.603906,-19.040709)"
+       inkscape:export-filename="/home/cody/School/CPE464/Program 3/SlidingWindowsDesign/Images/1b.PacketFlowDiagram.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <path
+         inkscape:connector-curvature="0"
+         id="path3012-4-7-33-8-8"
+         d="M 117.25403,759.4432 482.03169,746.70488"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path3014-6-9-7-6-6"
+         d="m 124.22629,756.21898 -7.24831,3.20205 7.09449,2.7469"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+  </g>
+</svg>
