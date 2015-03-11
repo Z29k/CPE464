@@ -20,6 +20,7 @@
 
 #include "networks.h"
 #include "cpe464.h"
+#include "packet.h"
 
 int32_t udp_server() {
 
@@ -113,13 +114,52 @@ int32_t select_call(int32_t socket_num, int32_t seconds, int32_t microseconds, i
 		return 0;	
 }
 
+
+int32_t send_packet(uint8_t *data, uint32_t len, Connection *connection, uint8_t flag, 
+	uint32_t seq_num) {
+	Packet packet;
+	int32_t send_len = 0;
+	
+	packet.seq_num = seq_num;
+	packet.flag = flag;
+	packet.size = len + HEADER_LENGTH;
+	
+	memcpy(packet.payload, data, len);
+	
+	construct(&packet);
+	
+	if ((send_len = sendtoErr(connection->sk_num, packet.raw, packet.size, 0,
+		(struct sockaddr *) &(connection->remote), connection->len)) < 0) {
+		
+		perror("ERROR!! send_buf, sendto");
+		exit(-1);
+	}
+	
+	return send_len;
+}
+
+int32_t recv_packet(Packet *packet, int32_t recv_sk_num, Connection *connection) {
+	int32_t recv_len = 0;
+	uint32_t remote_len = sizeof(struct sockaddr_in);
+	
+	if ((recv_len = recvfromErr(recv_sk_num, packet->raw, MAX_PACKET_LENGTH + HEADER_LENGTH, 0, 
+		(struct sockaddr *) &(connection->remote), &remote_len)) < 0) {
+		perror("recv_buf, recvfrom");
+		exit(-1);
+	}
+	
+	deconstruct(packet);
+	
+	return recv_len - HEADER_LENGTH;
+}
+
 int32_t send_buf(uint8_t *buf, uint32_t len, Connection *connection, uint8_t flag, 
 	uint32_t seq_num, uint8_t *packet) {
 
 	int32_t send_len = 0;
 	uint16_t checksum = 0;
 	
-	/*set up the packet (seq#, cec, flag, data) */
+	//set up the packet (seq#, cec, flag, data) 
 	if (len > 0)
 		memcpy(&packet[7], buf, len); // should be 8?
 	
@@ -150,7 +190,7 @@ int32_t recv_buf(uint8_t *buf, int32_t len, int32_t recv_sk_num,
 	int32_t recv_len = 0;
 	uint32_t remote_len = sizeof(struct sockaddr_in);
 	
-	if ((recv_len = recvfrom(recv_sk_num, data_buf, len, 0, 
+	if ((recv_len = recvfromErr(recv_sk_num, data_buf, len, 0, 
 		(struct sockaddr *) &(connection->remote), &remote_len)) < 0) {
 		perror("recv_buf, recvfrom");
 		exit(-1);

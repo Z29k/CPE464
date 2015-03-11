@@ -108,6 +108,7 @@ STATE filename(char *fname, int32_t buf_size, Window *window) {
 	memcpy(&buf[4], fname, fname_len);
 	
 	send_buf(buf, fname_len + 4, &server, FNAME, 0, packet);
+	//send_packet(buf, fname_len + 4, &server, FNAME, 0);
 	
 	if (select_call(server.sk_num, 1, 0, NOT_NULL) == 1) {
 	

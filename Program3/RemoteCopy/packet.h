@@ -3,7 +3,7 @@
 
 #define HEADER_LENGTH 11
 
-#include "networks.h"
+#define MAX_PACKET_LENGTH 1400
 
 typedef struct packet Packet;
 
@@ -12,8 +12,8 @@ struct packet {
 	int16_t checksum;
 	uint8_t flag;
 	uint32_t size;
-	uint8_t payload[MAX_LEN - HEADER_LENGTH];
-	uint8_t raw[MAX_LEN];
+	uint8_t payload[MAX_PACKET_LENGTH - HEADER_LENGTH];
+	uint8_t raw[MAX_PACKET_LENGTH];
 };
 
 void construct(Packet *packet);
