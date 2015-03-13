@@ -28,7 +28,7 @@
 typedef enum State STATE;
 
 enum State {
-	START, DONE, FILENAME, SEND_DATA, WAIT_ON_ACK, TIMEOUT_ON_ACK
+	START, DONE, FILENAME, SEND_DATA, PROCESS, WAIT_ON_ACK,
 };
 
 void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Connection *client,
@@ -38,11 +38,11 @@ STATE filename(Connection *client, Packet *packet, uint8_t *buf, int32_t recv_le
 	int32_t *bufsize, Window *window);
 
 STATE send_data(Connection *client, Packet *packet, int32_t data_file, 
-	int32_t buf_size, int32_t *seq_num);
-	
-STATE timeout_on_ack(Connection *client, Packet *packet);
+	int32_t buf_size, int32_t *seq_num, Window *window);
 
-STATE wait_on_ack(Connection *client);
+STATE process(Connection *client, Window *window);
+
+STATE wait_on_ack(Connection *client, Window *window);
 
 int main(int argc, char **argv) {
 	int32_t server_sk_num = 0;
@@ -117,15 +117,15 @@ void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Conne
 				break;
 				
 			case SEND_DATA:
-				state = send_data(client, packet, data_file, buf_size, &seq_num);
+				state = send_data(client, packet, data_file, buf_size, &seq_num, &window);
+				break;
+			
+			case PROCESS:
+				state = process(client, &window);
 				break;
 			
 			case WAIT_ON_ACK:
-				state = wait_on_ack(client);
-				break;
-			
-			case TIMEOUT_ON_ACK:
-				state = timeout_on_ack(client, packet);
+				state = wait_on_ack(client, &window);
 				break;
 			
 			case DONE:
@@ -171,6 +171,49 @@ STATE filename(Connection *client, Packet *packet, uint8_t *buf, int32_t recv_le
 }
 
 STATE send_data(Connection *client, Packet *packet, int32_t data_file, 
+	int buf_size, int32_t *seq_num, Window *window) {
+	
+	int32_t len_read = 0;
+	
+	// Send a packet
+	if (is_closed(window)) {
+		return WAIT_ON_ACK;
+	}
+	else {
+		len_read = read(data_file, packet->payload, buf_size);
+		packet->seq_num = window->middle;
+		packet->size = len_read + HEADER_LENGTH;
+		
+		switch (len_read) {
+			case -1:
+				perror("send_data, read error");
+				return DONE;
+				break;
+			case 0:
+				packet->flag = END_OF_FILE;
+				construct(packet);
+				send_packet2(packet, client);
+				printf("File Transfer Complete.\n");
+				return DONE;
+				break;
+			default:
+				packet->flag = DATA;
+				construct(packet);
+				send_packet2(packet, client);
+				window->middle++;
+				add_to_buffer(window, packet);
+				break;
+		}	
+	}
+	
+	if (select_call(client->sk_num, 0, 0, NOT_NULL) == 1)
+		return PROCESS;
+	
+	return SEND_DATA;
+}
+
+/*
+STATE send_data(Connection *client, Packet *packet, int32_t data_file, 
 	int buf_size, int32_t *seq_num) {
 	//uint8_t buf[MAX_LEN];
 	int32_t len_read = 0;
@@ -205,55 +248,56 @@ STATE send_data(Connection *client, Packet *packet, int32_t data_file,
 			break;
 	}
 }
+*/
 
-STATE wait_on_ack(Connection *client) {
-	static int32_t send_count = 0;
+STATE process(Connection *client, Window *window) {
 	uint32_t crc_check = 0;
-	uint8_t buf[MAX_LEN];
-	int32_t len = 1000;
-	uint8_t flag = 0;
-	int32_t seq_num = 0;
+	Packet incomming;
+	Packet resend;
+	int32_t rr;
 	
-	send_count++;
-	if (send_count > 5) {
-		printf("Sent data 5 times, no ACK, client session terminated.\n");
-		return DONE;
-	}
-	
-	if (select_call(client->sk_num, 1, 0, NOT_NULL) != 1)
-		return TIMEOUT_ON_ACK;
-		
-	crc_check = recv_buf(buf, len, client->sk_num, client, &flag, &seq_num);
+	crc_check = recv_packet(&incomming, client->sk_num, client);
 	
 	if (crc_check == CRC_ERROR)
 		return WAIT_ON_ACK;
 	
-	if (flag != ACK) {
-		printf("In wait_on_ack but its not an ACK flag %d (which should nover happen)\n", flag);
-		exit(-1);
+	if (incomming.flag == ACK) {
+		rr = htonl(((int32_t *)incomming.payload)[0]);
+		slide(window, rr);
 	}
-	
-	/* ack is good so reset count and then go send some more data */
-	send_count = 0;
+	else if (incomming.flag == SREJ) {
+		rr = htonl(((int32_t *)incomming.payload)[0]);
+		get_from_buffer(window, &resend, rr);
+		send_packet2(&resend, client);
+	}
 	
 	return SEND_DATA;
+	
 }
 
-STATE timeout_on_ack(Connection *client, Packet *packet) {
-	if (send_packet2(packet, client) < 0) {
-		perror("timeout_on_ack");
-		exit(-1);
+STATE wait_on_ack(Connection *client, Window *window) {
+	static int32_t send_count = 0;
+	Packet packet;
+	
+	send_count++;
+	if (send_count > 10) {
+		printf("Sent data 10 times, no ACK, client session terminated.\n");
+		return DONE;
 	}
 	
-	/*
-	if (sendtoErr(client->sk_num, packet, packet_len, 0, 
-		(struct sockaddr *) &(client->remote), client->len) < 0) {
-		
-		perror("timeout_on_ack sendto");
-		exit(-1);
+	if (select_call(client->sk_num, 1, 0, NOT_NULL) != 1) {
+		get_from_buffer(window, &packet, window->bottom);
+	
+		if (send_packet2(&packet, client) < 0) {
+			perror("timeout_on_ack");
+			exit(-1);
+		}
+	
+		return WAIT_ON_ACK;
 	}
-	*/
-	return WAIT_ON_ACK;
+	
+	send_count = 0;
+	return PROCESS;
 }
 
 

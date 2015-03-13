@@ -21,7 +21,11 @@ void init_window(Window *, int);
 
 void add_to_buffer(Window *window, Packet *packet);
 
-void remove_from_buffer(Window *window, Packet *packet);
+void get_from_buffer(Window *window, Packet *packet, int seq_num);
+
+void remove_from_buffer(Window *window, Packet *packet, int seq_num);
+
+void slide(Window *window, int new_bottom);
 
 void destroy_window(Window *window);
 
