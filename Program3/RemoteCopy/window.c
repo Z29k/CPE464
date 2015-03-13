@@ -16,7 +16,7 @@ void init_window(Window *window, int size) {
 }
 
 int is_closed(Window *window) {
-	return window->middle == window->top;
+	return window->middle > window->top;
 }
 
 void add_to_buffer(Window *window, Packet *packet) {

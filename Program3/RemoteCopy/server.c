@@ -112,23 +112,28 @@ void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Conne
 				break;
 			
 			case FILENAME:
+				printf("\nSTATE: FILENAME\n");
 				seq_num = 1;
 				state = filename(client, packet, buf, recv_len, &data_file, &buf_size, &window);
 				break;
 				
 			case SEND_DATA:
+				printf("\nSTATE: SEND_DATA\n");
 				state = send_data(client, packet, data_file, buf_size, &seq_num, &window);
 				break;
 			
 			case PROCESS:
+				printf("\nSTATE: PROCESS\n");
 				state = process(client, &window);
 				break;
 			
 			case WAIT_ON_ACK:
+				printf("\nSTATE: WAIT_ON_ACK\n");
 				state = wait_on_ack(client, &window);
 				break;
 			
 			case DONE:
+				printf("\nSTATE: DONE\n");
 				destroy_window(&window);
 				break;
 			
@@ -160,12 +165,10 @@ STATE filename(Connection *client, Packet *packet, uint8_t *buf, int32_t recv_le
 	
 	if (((*data_file) = open(fname, O_RDONLY)) < 0) {
 		send_packet(response, 0, client, FNAME_BAD, 0);
-		//send_buf(response, 0, client, FNAME_BAD, 0, buf);
 		return DONE;
 	}
 	else {
 		send_packet(response, 0, client, FNAME_OK, 0);
-		//send_buf(response, 0, client, FNAME_OK, 0, buf);
 		return SEND_DATA;
 	}
 }
@@ -206,49 +209,12 @@ STATE send_data(Connection *client, Packet *packet, int32_t data_file,
 		}	
 	}
 	
+	// Check for RRs and SREJs
 	if (select_call(client->sk_num, 0, 0, NOT_NULL) == 1)
 		return PROCESS;
 	
 	return SEND_DATA;
 }
-
-/*
-STATE send_data(Connection *client, Packet *packet, int32_t data_file, 
-	int buf_size, int32_t *seq_num) {
-	//uint8_t buf[MAX_LEN];
-	int32_t len_read = 0;
-	
-	//len_read = read(data_file, buf, buf_size);
-	len_read = read(data_file, packet->payload, buf_size);
-	
-	packet->seq_num = *seq_num;
-	packet->size = len_read + HEADER_LENGTH;
-	
-	switch (len_read) {
-		case -1:
-			perror("send_data, read error");
-			return DONE;
-			break;
-		case 0:
-			packet->flag = END_OF_FILE;
-			construct(packet);
-			send_packet2(packet, client);
-		
-			//(*packet_len) = send_buf(buf, 1, client, END_OF_FILE, *seq_num, packet);
-			printf("File Transfer Complete.\n");
-			return DONE;
-			break;
-		default:
-			//(*packet_len) = send_buf(buf, len_read, client, DATA, *seq_num, packet);
-			packet->flag = DATA;
-			construct(packet);
-			send_packet2(packet, client);
-			(*seq_num)++;
-			return WAIT_ON_ACK;
-			break;
-	}
-}
-*/
 
 STATE process(Connection *client, Window *window) {
 	uint32_t crc_check = 0;
@@ -262,7 +228,7 @@ STATE process(Connection *client, Window *window) {
 		return WAIT_ON_ACK;
 	
 	if (incomming.flag == ACK) {
-		rr = htonl(((int32_t *)incomming.payload)[0]);
+		rr = incomming.seq_num;
 		slide(window, rr);
 	}
 	else if (incomming.flag == SREJ) {

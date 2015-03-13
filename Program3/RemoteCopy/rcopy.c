@@ -25,11 +25,12 @@
 typedef enum State STATE;
 
 enum State {
-	DONE, FILENAME, RECV_DATA, FILE_OK
+	DONE, FILENAME, RECV_DATA, FILE_OK, MISSING
 };
 
 STATE filename(char * fname, int32_t buf_size, Window *window);
 STATE recv_data(int32_t output_file, Window *window);
+STATE missing(Window *window);
 void check_args(int argc, char **argv);
 
 Connection server;
@@ -52,6 +53,7 @@ int main(int argc, char **argv) {
 		
 		switch (state) {
 			case FILENAME:
+				printf("\nSTATE: FILENAME\n");
 				/* Every time we try to start/restart a connection get a new socket */				
 				if (udp_client_setup(argv[6], atoi(argv[7]), &server) < 0)
 					exit(-1);
@@ -70,6 +72,7 @@ int main(int argc, char **argv) {
 				break;
 				
 			case FILE_OK:
+				printf("\nSTATE: FILE_OK\n");
 				select_count = 0;
 				
 				if ((output_file = open(argv[2], O_CREAT | O_TRUNC | O_WRONLY, 0600)) < 0) {
@@ -82,10 +85,18 @@ int main(int argc, char **argv) {
 				break;
 				
 			case RECV_DATA:
+				printf("\nSTATE: RECV_DATA\n");
 				state = recv_data(output_file, &window);
 				break;
 				
+				
+			case MISSING:
+				printf("\nSTATE: MISSING\n");
+				state = missing(&window);
+				break;
+				
 			case DONE:
+				printf("\nSTATE: DONE\n");
 				destroy_window(&window);
 				break;
 			
@@ -128,7 +139,6 @@ STATE filename(char *fname, int32_t buf_size, Window *window) {
 
 STATE recv_data(int32_t output_file, Window *window) {
 	int32_t data_len = 0;
-	static int32_t expected_seq_num = START_SEQ_NUM;
 	Packet data_packet;
 	Packet ack;
 	
@@ -137,8 +147,6 @@ STATE recv_data(int32_t output_file, Window *window) {
 		return DONE;
 	}
 	
-	window->bottom = expected_seq_num;
-	
 	data_len = recv_packet(&data_packet, server.sk_num, &server);
 	
 	/* do state RECV_DATA again if there is a crc error (don't send ack, don't write data) */
@@ -146,11 +154,12 @@ STATE recv_data(int32_t output_file, Window *window) {
 		return RECV_DATA;
 		
 	/* send ACK */
-	ack.seq_num = data_packet.seq_num;
+	ack.seq_num = data_packet.seq_num + 1;
 	ack.flag = ACK;
 	ack.size = HEADER_LENGTH;
 	construct(&ack);
 	send_packet2(&ack, &server);
+	printf("Sendding RR%d\n", ack.seq_num);
 	
 	if (data_packet.flag == END_OF_FILE) {
 		close(output_file);
@@ -159,13 +168,17 @@ STATE recv_data(int32_t output_file, Window *window) {
 	}
 	
 	if (data_packet.seq_num == window->bottom) {
-		expected_seq_num++;
+		window->bottom++;
 		write(output_file, data_packet.payload, data_len);
 	}
 	else
 		printf("Bad sequence number\n");
 	
 	return RECV_DATA;	
+}
+
+STATE missing(Window *window) {
+	return MISSING;
 }
 
 void check_args(int argc, char **argv) {
