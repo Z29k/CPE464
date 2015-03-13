@@ -17,33 +17,17 @@ void construct(Packet *packet) {
 	
 	((uint32_t *)data)[0] = htonl(packet->seq_num);
 	
-	printf("SEQ#: %d %d %d %d\n", data[0], data[1], data[2], data[3]);
-	printf("SEQ#: %d\n", ntohl(((uint32_t *)data)[0]));
-	
 	data[6] = packet->flag;
 	*((uint32_t *)(data+7)) = htonl(packet->size);
 	memcpy(data+11, &packet->payload, MAX_PACKET_LENGTH);
 	
 	packet->checksum = in_cksum((uint16_t *) data, packet->size);
 	
-	printf("Packet->checksum %d\n", packet->checksum);
-	
-	printf("RAW: ");
-	for (i = 0; i < packet->size / 2; i++)
-		printf("%d ", ntohs(((int16_t *)data)[i]));
-	printf("\n");
-	
-	//*((int16_t *)(data + 4)) = htons(packet->checksum);
 	((int16_t *)data)[2] = packet->checksum;
 	
-	printf("RAW: ");
-	for (i = 0; i < packet->size / 2; i++)
-		printf("%d ", ntohs(((int16_t *)data)[i]));
-	printf("\n");
-	printf("data[4] checksum: %d\n", ntohs(*((int16_t *)(data + 4))));
 	
-	printf("Constructing packet...\n");
-	print_packet(packet);
+	//printf("Constructing packet...\n");
+	//print_packet(packet);
 	
 }
 
@@ -54,9 +38,6 @@ int deconstruct(Packet *packet) {
 	for (i = 0; i < MAX_PACKET_LENGTH; i++) 
 		packet->payload[i] = 0;
 	
-	printf("SEQ#: %d %d %d %d\n", data[0], data[1], data[2], data[3]);
-	printf("SEQ#: %d\n", ntohl(((uint32_t *)data)[0]));
-	
 	packet->seq_num = ntohl(((uint32_t *)data)[0]);
 	
 	packet->checksum = ntohs(*((int16_t *)(data + 4)));
@@ -65,8 +46,8 @@ int deconstruct(Packet *packet) {
 	
 	memcpy(packet->payload, data + HEADER_LENGTH, packet->size - HEADER_LENGTH);
 	
-	printf("Deconstructing packet...\n");
-	print_packet(packet);
+	//printf("Deconstructing packet...\n");
+	//print_packet(packet);
 	
 	return in_cksum((uint16_t *) data, packet->size);
 }

@@ -107,13 +107,10 @@ STATE filename(char *fname, int32_t buf_size, Window *window) {
 	
 	//send_buf(buf, fname_len + 4, &server, FNAME, 0, packet);
 	send_packet(buf, fname_len + 4, &server, FNAME, 0);
-	printf("Before select\n");
 	
 	if (select_call(server.sk_num, 1, 0, NOT_NULL) == 1) {
-		printf("Before recv_packet\n");
 		//recv_check = recv_buf(packet, 1000, server.sk_num, &server, &flag, &seq_num);
 		recv_check = recv_packet(&packet, server.sk_num, &server);
-		printf("After recv_packet\n");
 		/*check for bit flip ... if so send the file name again */
 
 		if (recv_check == CRC_ERROR)
@@ -131,12 +128,12 @@ STATE filename(char *fname, int32_t buf_size, Window *window) {
 }
 
 STATE recv_data(int32_t output_file, Window *window) {
-	int32_t seq_num = 0;
-	uint8_t flag = 0;
 	int32_t data_len = 0;
-	uint8_t data_buf[MAX_LEN];
-	uint8_t packet[MAX_LEN];
+	//uint8_t data_buf[MAX_LEN];
+	//uint8_t packet_old[MAX_LEN];
 	static int32_t expected_seq_num = START_SEQ_NUM;
+	Packet data_packet;
+	Packet ack;
 	
 	if (select_call(server.sk_num, 10, 0, NOT_NULL) == 0) {
 		printf("Timeout after 10 seconds, client done.\n");
@@ -145,24 +142,34 @@ STATE recv_data(int32_t output_file, Window *window) {
 	
 	window->bottom = expected_seq_num;
 	
-	data_len = recv_buf(data_buf, 1400, server.sk_num, &server, &flag, &seq_num);
+	//data_len = recv_buf(data_buf, 1400, server.sk_num, &server, &flag, &seq_num);
+	data_len = recv_packet(&data_packet, server.sk_num, &server);
 	
 	/* do state RECV_DATA again if there is a crc error (don't send ack, don't write data) */
 	if (data_len == CRC_ERROR) 
 		return RECV_DATA;
 		
 	/* send ACK */
-	send_buf(packet, 1, &server, ACK, 0, packet);
+	//send_buf(packet_old, 1, &server, ACK, 0, packet_old);
+	ack.seq_num = data_packet.seq_num;
+	ack.flag = ACK;
+	ack.size = HEADER_LENGTH;
+	construct(&ack);
+	send_packet2(&ack, &server);
 	
-	if (flag == END_OF_FILE) {
+	if (data_packet.flag == END_OF_FILE) {
+		close(output_file);
 		printf("file done\n");
 		return DONE;
 	}
 	
-	if (seq_num == window->bottom) {
+	if (data_packet.seq_num == window->bottom) {
 		expected_seq_num++;
-		write(output_file, &data_buf, data_len);
+		//write(output_file, &data_buf, data_len);
+		write(output_file, data_packet.payload, data_len);
 	}
+	else
+		printf("Bad sequence number\n");
 	
 	return RECV_DATA;	
 }

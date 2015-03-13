@@ -37,6 +37,8 @@ int32_t select_call(int32_t socket_num, int32_t seconds, int32_t microseconds, i
 int32_t send_packet(uint8_t *data, uint32_t len, Connection *connection, uint8_t flag, 
 	uint32_t seq_num);
 	
+int32_t send_packet2(Packet *packet, Connection *connection);
+	
 int32_t recv_packet(Packet *packet, int32_t recv_sk_num, Connection *connection);
 	
 int32_t send_buf(uint8_t *buf, uint32_t len, Connection *connection, uint8_t flag, 

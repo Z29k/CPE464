@@ -31,16 +31,16 @@ enum State {
 	START, DONE, FILENAME, SEND_DATA, WAIT_ON_ACK, TIMEOUT_ON_ACK
 };
 
-void process_client(int32_t server_sk_num, Packet *packet, 
-	uint8_t *buf, int32_t recv_len, Connection *client);
+void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Connection *client,
+	Packet *packet);
 
 STATE filename(Connection *client, Packet *packet, uint8_t *buf, int32_t recv_len, int32_t *data_file, 
 	int32_t *bufsize, Window *window);
 
-STATE send_data(Connection *client, uint8_t *packet, int32_t *packet_len, int32_t data_file, 
+STATE send_data(Connection *client, Packet *packet, int32_t data_file, 
 	int32_t buf_size, int32_t *seq_num);
 	
-STATE timeout_on_ack(Connection *client, uint8_t *packet, int32_t packet_len);
+STATE timeout_on_ack(Connection *client, Packet *packet);
 
 STATE wait_on_ack(Connection *client);
 
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
 				}
 				//process child
 				if (pid == 0) {
-					process_client(server_sk_num, &packet, buf, recv_len, &client);
+					process_client(server_sk_num, buf, recv_len, &client, &packet);
 					exit(0);
 				}
 			}
@@ -93,11 +93,10 @@ int main(int argc, char **argv) {
 	}
 }
 
-void process_client(int32_t server_sk_num, Packet *packet, uint8_t *buf, int32_t recv_len, Connection *client) {
+void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Connection *client,
+	Packet *packet) {
 	STATE state = START;
 	int32_t data_file = 0;
-	int32_t packet_len = 0;
-	uint8_t packet_old[MAX_LEN];
 	int32_t buf_size = 0;
 	int32_t seq_num = START_SEQ_NUM;
 	Window window;
@@ -118,7 +117,7 @@ void process_client(int32_t server_sk_num, Packet *packet, uint8_t *buf, int32_t
 				break;
 				
 			case SEND_DATA:
-				state = send_data(client, packet_old, &packet_len, data_file, buf_size, &seq_num);
+				state = send_data(client, packet, data_file, buf_size, &seq_num);
 				break;
 			
 			case WAIT_ON_ACK:
@@ -126,7 +125,7 @@ void process_client(int32_t server_sk_num, Packet *packet, uint8_t *buf, int32_t
 				break;
 			
 			case TIMEOUT_ON_ACK:
-				state = timeout_on_ack(client, packet_old, packet_len);
+				state = timeout_on_ack(client, packet);
 				break;
 			
 			case DONE:
@@ -168,12 +167,16 @@ STATE filename(Connection *client, Packet *packet, uint8_t *buf, int32_t recv_le
 	}
 }
 
-STATE send_data(Connection *client, uint8_t *packet, int32_t *packet_len, int32_t data_file,
+STATE send_data(Connection *client, Packet *packet, int32_t data_file, 
 	int buf_size, int32_t *seq_num) {
-	uint8_t buf[MAX_LEN];
+	//uint8_t buf[MAX_LEN];
 	int32_t len_read = 0;
 	
-	len_read = read(data_file, buf, buf_size);
+	//len_read = read(data_file, buf, buf_size);
+	len_read = read(data_file, packet->payload, buf_size);
+	
+	packet->seq_num = *seq_num;
+	packet->size = len_read + HEADER_LENGTH;
 	
 	switch (len_read) {
 		case -1:
@@ -181,12 +184,19 @@ STATE send_data(Connection *client, uint8_t *packet, int32_t *packet_len, int32_
 			return DONE;
 			break;
 		case 0:
-			(*packet_len) = send_buf(buf, 1, client, END_OF_FILE, *seq_num, packet);
+			packet->flag = END_OF_FILE;
+			construct(packet);
+			send_packet2(packet, client);
+		
+			//(*packet_len) = send_buf(buf, 1, client, END_OF_FILE, *seq_num, packet);
 			printf("File Transfer Complete.\n");
 			return DONE;
 			break;
 		default:
-			(*packet_len) = send_buf(buf, len_read, client, DATA, *seq_num, packet);
+			//(*packet_len) = send_buf(buf, len_read, client, DATA, *seq_num, packet);
+			packet->flag = DATA;
+			construct(packet);
+			send_packet2(packet, client);
 			(*seq_num)++;
 			return WAIT_ON_ACK;
 			break;
@@ -226,14 +236,20 @@ STATE wait_on_ack(Connection *client) {
 	return SEND_DATA;
 }
 
-STATE timeout_on_ack(Connection *client, uint8_t *packet, int32_t packet_len) {
+STATE timeout_on_ack(Connection *client, Packet *packet) {
+	if (send_packet2(packet, client) < 0) {
+		perror("timeout_on_ack");
+		exit(-1);
+	}
+	
+	/*
 	if (sendtoErr(client->sk_num, packet, packet_len, 0, 
 		(struct sockaddr *) &(client->remote), client->len) < 0) {
 		
 		perror("timeout_on_ack sendto");
 		exit(-1);
 	}
-	
+	*/
 	return WAIT_ON_ACK;
 }
 

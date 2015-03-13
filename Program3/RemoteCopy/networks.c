@@ -115,6 +115,18 @@ int32_t select_call(int32_t socket_num, int32_t seconds, int32_t microseconds, i
 		return 0;	
 }
 
+int32_t send_packet2(Packet *packet, Connection *connection) {
+	int32_t send_len = 0;
+	
+	if ((send_len = sendtoErr(connection->sk_num, packet->raw, packet->size, 0,
+		(struct sockaddr *) &(connection->remote), connection->len)) < 0) {
+		
+		perror("ERROR!! send_packet2, sendto");
+		exit(-1);
+	}
+	
+	return send_len;
+}
 
 int32_t send_packet(uint8_t *data, uint32_t len, Connection *connection, uint8_t flag, 
 	uint32_t seq_num) {
@@ -135,8 +147,6 @@ int32_t send_packet(uint8_t *data, uint32_t len, Connection *connection, uint8_t
 		perror("ERROR!! send_packet, sendto");
 		exit(-1);
 	}
-	
-	printf("send_packet() finished %d\n", send_len);
 	
 	return send_len;
 }
