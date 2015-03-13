@@ -27,6 +27,10 @@ void remove_from_buffer(Window *window, Packet *packet, int seq_num);
 
 void slide(Window *window, int new_bottom);
 
+int is_valid(Window *window, int seq_num);
+
+int is_in_window(Window *window, int seq_num);
+
 void destroy_window(Window *window);
 
 int is_closed(Window *);

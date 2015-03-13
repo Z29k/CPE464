@@ -61,6 +61,24 @@ void slide(Window *window, int new_bottom) {
 	window->top = new_bottom + window->size - 1;
 }
 
+int is_valid(Window *window, int seq_num) {
+	return window->valid[(seq_num - 1) % window->size];
+}
+
+int all_valid(Window *window) {
+	int i;
+	
+	for (i = window->bottom; i <= window->top; i++)
+		if (window->valid[(i - 1) % window->size] == 0)
+			return 0;
+	
+	return 1;
+}
+
+int is_in_window(Window *window, int seq_num) {
+	return seq_num >= window->bottom && seq_num <= window->top;
+}
+
 void destroy_window(Window *window) {
 	free(window->buffer);
 	free(window->valid);

@@ -29,8 +29,8 @@ enum State {
 };
 
 STATE filename(char * fname, int32_t buf_size, Window *window);
-STATE recv_data(int32_t output_file, Window *window);
-STATE missing(Window *window);
+STATE recv_data(Window *window, int32_t output_file);
+STATE missing(Window *window, int32_t output_file);
 void check_args(int argc, char **argv);
 
 Connection server;
@@ -86,13 +86,13 @@ int main(int argc, char **argv) {
 				
 			case RECV_DATA:
 				printf("\nSTATE: RECV_DATA\n");
-				state = recv_data(output_file, &window);
+				state = recv_data(&window, output_file);
 				break;
 				
 				
 			case MISSING:
 				printf("\nSTATE: MISSING\n");
-				state = missing(&window);
+				state = missing(&window, output_file);
 				break;
 				
 			case DONE:
@@ -137,7 +137,7 @@ STATE filename(char *fname, int32_t buf_size, Window *window) {
 	return FILENAME;
 }
 
-STATE recv_data(int32_t output_file, Window *window) {
+STATE recv_data(Window *window, int32_t output_file) {
 	int32_t data_len = 0;
 	Packet data_packet;
 	Packet ack;
@@ -149,9 +149,8 @@ STATE recv_data(int32_t output_file, Window *window) {
 	
 	data_len = recv_packet(&data_packet, server.sk_num, &server);
 	
-	/* do state RECV_DATA again if there is a crc error (don't send ack, don't write data) */
 	if (data_len == CRC_ERROR) 
-		return RECV_DATA;
+		return MISSING;
 		
 	/* send ACK */
 	ack.seq_num = data_packet.seq_num + 1;
@@ -168,17 +167,95 @@ STATE recv_data(int32_t output_file, Window *window) {
 	}
 	
 	if (data_packet.seq_num == window->bottom) {
-		window->bottom++;
+		slide(window, window->bottom + 1);
 		write(output_file, data_packet.payload, data_len);
 	}
-	else
-		printf("Bad sequence number\n");
+	else if (data_packet.seq_num < window->bottom 
+		&& data_packet.seq_num > window->top) {
+		printf("Received out of window packet. Quitting...\n");
+		return DONE;
+	}
+	else {
+		add_to_buffer(window, &data_packet);
+		window->middle = window->bottom;
+		return MISSING;
+	}
 	
 	return RECV_DATA;	
 }
 
-STATE missing(Window *window) {
-	return MISSING;
+STATE missing(Window *window, int32_t output_file) {
+	int i;
+	int32_t data_len = 0;
+	Packet srej;
+	Packet rr;
+	Packet data_packet;
+	Packet to_write;
+	
+	
+	/* send SREJ */
+	srej.seq_num = window->middle;
+	srej.flag = SREJ;
+	srej.size = HEADER_LENGTH;
+	construct(&srej);
+	send_packet2(&srej, &server);
+	printf("Sendding SREJ%d\n", srej.seq_num);
+	
+	if (select_call(server.sk_num, 10, 0, NOT_NULL) == 0) {
+		printf("Timeout after 10 seconds, client done.\n");
+		return DONE;
+	}
+	
+	
+	data_len = recv_packet(&data_packet, server.sk_num, &server);
+	
+	if (data_len == CRC_ERROR) 
+		return MISSING;
+	
+	if (data_packet.flag == END_OF_FILE) {
+		if (window->bottom == data_packet.flag) {
+			printf("file done\n");
+			return DONE;
+		}
+		return MISSING;
+	}
+	
+	if (is_in_window(window, data_packet.seq_num)) {
+		add_to_buffer(window, &data_packet);
+		
+		for (i = window->bottom; i <= window->top + 1; i++) {
+			window->middle = i;
+			if (is_valid(window, i) == 0) {
+				break;
+			}
+		}
+		
+		for (i = window->bottom; i < window->middle; i++) {
+			remove_from_buffer(window, &to_write, i);
+			write(output_file, to_write.payload, data_len);			
+		}
+		
+		// send RR
+		rr.seq_num = window->middle;
+		rr.flag = ACK;
+		rr.size = HEADER_LENGTH;
+		construct(&rr);
+		send_packet2(&rr, &server);
+		printf("Sendding RR%d\n", rr.seq_num);
+		
+		// All packets accounted for
+		if (is_closed(window)) {
+			slide(window, window->middle);
+			return RECV_DATA;		
+		}
+		
+		slide(window, window->middle);
+		
+		return MISSING;
+	}
+	
+	printf("Recieved out of window packet, exiting...\n");
+	return DONE;
 }
 
 void check_args(int argc, char **argv) {
