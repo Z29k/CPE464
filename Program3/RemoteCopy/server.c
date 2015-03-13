@@ -222,10 +222,14 @@ STATE process(Connection *client, Window *window) {
 	Packet resend;
 	int32_t rr;
 	
+	printf("Reading packet...\n");
 	crc_check = recv_packet(&incomming, client->sk_num, client);
 	
-	if (crc_check == CRC_ERROR)
+	printf("After recv_packet\n");
+	if (crc_check == CRC_ERROR) {
+		printf("CRC errror in packet %d\n", incomming.seq_num);
 		return WAIT_ON_ACK;
+	}
 	
 	if (incomming.flag == ACK) {
 		rr = incomming.seq_num;
@@ -254,8 +258,10 @@ STATE wait_on_ack(Connection *client, Window *window) {
 	if (select_call(client->sk_num, 1, 0, NOT_NULL) != 1) {
 		get_from_buffer(window, &packet, window->bottom);
 	
+		printf("No packets reseived, sending nudge\n");
+		
 		if (send_packet2(&packet, client) < 0) {
-			perror("timeout_on_ack");
+			perror("send packet, timeout_on_ack");
 			exit(-1);
 		}
 	

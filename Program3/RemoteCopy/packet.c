@@ -35,14 +35,21 @@ int deconstruct(Packet *packet) {
 	uint8_t *data = packet->raw;
 	int i;
 	
+	printf("Deconsntructing packet\n");
 	for (i = 0; i < MAX_PACKET_LENGTH; i++) 
 		packet->payload[i] = 0;
 	
 	packet->seq_num = ntohl(((uint32_t *)data)[0]);
-	
 	packet->checksum = ntohs(*((int16_t *)(data + 4)));
 	packet->flag = data[6];
 	packet->size = ntohl(*((uint32_t *)(data+7)));
+	
+	// If size is invalid, treat as CRC_ERROR
+	if (packet->size > MAX_PACKET_LENGTH + HEADER_LENGTH) {
+		printf("Invalid size %d when deconstructing packet %d\n",
+			packet->size, packet->seq_num);
+		return CRC_ERROR;
+	}
 	
 	memcpy(packet->payload, data + HEADER_LENGTH, packet->size - HEADER_LENGTH);
 	

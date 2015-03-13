@@ -31,6 +31,8 @@ enum State {
 STATE filename(char * fname, int32_t buf_size, Window *window);
 STATE recv_data(Window *window, int32_t output_file);
 STATE missing(Window *window, int32_t output_file);
+void send_rr(int seq_num);
+void send_srej(int seq_num);
 void check_args(int argc, char **argv);
 
 Connection server;
@@ -140,7 +142,6 @@ STATE filename(char *fname, int32_t buf_size, Window *window) {
 STATE recv_data(Window *window, int32_t output_file) {
 	int32_t data_len = 0;
 	Packet data_packet;
-	Packet ack;
 	
 	if (select_call(server.sk_num, 10, 0, NOT_NULL) == 0) {
 		printf("Timeout after 10 seconds, client done.\n");
@@ -149,35 +150,38 @@ STATE recv_data(Window *window, int32_t output_file) {
 	
 	data_len = recv_packet(&data_packet, server.sk_num, &server);
 	
-	if (data_len == CRC_ERROR) 
+	if (data_len == CRC_ERROR) {
+		printf("Received CRC ERROR on packet %d\n", data_packet.seq_num);
+		window->middle = window->bottom;
 		return MISSING;
-		
-	/* send ACK */
-	ack.seq_num = data_packet.seq_num + 1;
-	ack.flag = ACK;
-	ack.size = HEADER_LENGTH;
-	construct(&ack);
-	send_packet2(&ack, &server);
-	printf("Sendding RR%d\n", ack.seq_num);
+	}
+	
 	
 	if (data_packet.flag == END_OF_FILE) {
 		close(output_file);
 		printf("file done\n");
+		send_rr(data_packet.seq_num + 1);
 		return DONE;
 	}
 	
 	if (data_packet.seq_num == window->bottom) {
 		slide(window, window->bottom + 1);
 		write(output_file, data_packet.payload, data_len);
+		send_rr(window->bottom);
 	}
-	else if (data_packet.seq_num < window->bottom 
-		&& data_packet.seq_num > window->top) {
+	else if (data_packet.seq_num < window->bottom) {
+		printf("Recieved duplicate packet %d below window\n", data_packet.seq_num);
+		send_rr(window->bottom);
+	}
+	else if (data_packet.seq_num > window->top) {
 		printf("Received out of window packet. Quitting...\n");
 		return DONE;
 	}
 	else {
 		add_to_buffer(window, &data_packet);
 		window->middle = window->bottom;
+		printf("Received out of order packet %d, expecting %d\n",
+			 data_packet.seq_num, window->bottom);
 		return MISSING;
 	}
 	
@@ -187,19 +191,10 @@ STATE recv_data(Window *window, int32_t output_file) {
 STATE missing(Window *window, int32_t output_file) {
 	int i;
 	int32_t data_len = 0;
-	Packet srej;
-	Packet rr;
 	Packet data_packet;
 	Packet to_write;
 	
-	
-	/* send SREJ */
-	srej.seq_num = window->middle;
-	srej.flag = SREJ;
-	srej.size = HEADER_LENGTH;
-	construct(&srej);
-	send_packet2(&srej, &server);
-	printf("Sendding SREJ%d\n", srej.seq_num);
+	send_srej(window->middle);
 	
 	if (select_call(server.sk_num, 10, 0, NOT_NULL) == 0) {
 		printf("Timeout after 10 seconds, client done.\n");
@@ -209,12 +204,13 @@ STATE missing(Window *window, int32_t output_file) {
 	
 	data_len = recv_packet(&data_packet, server.sk_num, &server);
 	
-	if (data_len == CRC_ERROR) 
+	if (data_len == CRC_ERROR)
 		return MISSING;
 	
 	if (data_packet.flag == END_OF_FILE) {
 		if (window->bottom == data_packet.flag) {
 			printf("file done\n");
+			send_rr(window->bottom + 1);
 			return DONE;
 		}
 		return MISSING;
@@ -235,13 +231,7 @@ STATE missing(Window *window, int32_t output_file) {
 			write(output_file, to_write.payload, data_len);			
 		}
 		
-		// send RR
-		rr.seq_num = window->middle;
-		rr.flag = ACK;
-		rr.size = HEADER_LENGTH;
-		construct(&rr);
-		send_packet2(&rr, &server);
-		printf("Sendding RR%d\n", rr.seq_num);
+		send_rr(window->middle);
 		
 		// All packets accounted for
 		if (is_closed(window)) {
@@ -254,8 +244,30 @@ STATE missing(Window *window, int32_t output_file) {
 		return MISSING;
 	}
 	
-	printf("Recieved out of window packet, exiting...\n");
-	return DONE;
+	send_rr(window->middle);
+	return MISSING;
+}
+
+void send_rr(int seq_num) {
+	Packet rr;
+	
+	rr.seq_num = seq_num;
+	rr.flag = ACK;
+	rr.size = HEADER_LENGTH;
+	construct(&rr);
+	send_packet2(&rr, &server);
+	printf("Sendding RR%d\n", rr.seq_num);
+}
+
+void send_srej(int seq_num) {
+	Packet srej;
+	
+	srej.seq_num = seq_num;
+	srej.flag = SREJ;
+	srej.size = HEADER_LENGTH;
+	construct(&srej);
+	send_packet2(&srej, &server);
+	printf("Sendding SREJ%d\n", srej.seq_num);
 }
 
 void check_args(int argc, char **argv) {

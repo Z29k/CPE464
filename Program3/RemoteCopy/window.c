@@ -59,6 +59,10 @@ void slide(Window *window, int new_bottom) {
 	
 	window->bottom = new_bottom;
 	window->top = new_bottom + window->size - 1;
+	
+	window->middle = window->middle < window->bottom ? window->bottom : window->middle;
+	
+	printf("Window slid to %d %d %d\n", window->bottom, window->middle, window->top);
 }
 
 int is_valid(Window *window, int seq_num) {
