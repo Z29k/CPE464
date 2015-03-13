@@ -97,29 +97,29 @@ int main(int argc, char **argv) {
 }
 	
 STATE filename(char *fname, int32_t buf_size, Window *window) {
-	uint8_t packet[MAX_LEN];
+	//uint8_t packet[MAX_LEN];
 	uint8_t buf[MAX_LEN];
-	uint8_t flag = 0;
-	int32_t seq_num = 0;
 	int32_t fname_len = strlen(fname) + 1;
 	int32_t recv_check = 0;
-	
+	Packet packet;
 	memcpy(buf, &buf_size, 4);
 	memcpy(&buf[4], fname, fname_len);
 	
-	send_buf(buf, fname_len + 4, &server, FNAME, 0, packet);
-	//send_packet(buf, fname_len + 4, &server, FNAME, 0);
+	//send_buf(buf, fname_len + 4, &server, FNAME, 0, packet);
+	send_packet(buf, fname_len + 4, &server, FNAME, 0);
+	printf("Before select\n");
 	
 	if (select_call(server.sk_num, 1, 0, NOT_NULL) == 1) {
-	
-		recv_check = recv_buf(packet, 1000, server.sk_num, &server, &flag, &seq_num);
-
+		printf("Before recv_packet\n");
+		//recv_check = recv_buf(packet, 1000, server.sk_num, &server, &flag, &seq_num);
+		recv_check = recv_packet(&packet, server.sk_num, &server);
+		printf("After recv_packet\n");
 		/*check for bit flip ... if so send the file name again */
 
 		if (recv_check == CRC_ERROR)
 			return FILENAME;
 
-		if (flag == FNAME_BAD) {
+		if (packet.flag == FNAME_BAD) {
 			printf("File %s not found\n", fname);
 			return (DONE);
 		}

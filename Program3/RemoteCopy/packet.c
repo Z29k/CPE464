@@ -10,38 +10,65 @@
 
 void construct(Packet *packet) {
 	uint8_t *data = packet->raw;
-	int16_t checksum;
 	int i;
 	
-	for (i = 0; i < MAX_LEN; i++)
+	for (i = 0; i < MAX_PACKET_LENGTH + HEADER_LENGTH; i++)
 		data[i] = 0;
 	
 	((uint32_t *)data)[0] = htonl(packet->seq_num);
+	
+	printf("SEQ#: %d %d %d %d\n", data[0], data[1], data[2], data[3]);
+	printf("SEQ#: %d\n", ntohl(((uint32_t *)data)[0]));
+	
 	data[6] = packet->flag;
 	*((uint32_t *)(data+7)) = htonl(packet->size);
-	memcpy(data+11, &packet->payload, MAX_LEN - HEADER_LENGTH);
+	memcpy(data+11, &packet->payload, MAX_PACKET_LENGTH);
 	
-	checksum = in_cksum((unsigned short *) data, MAX_LEN);
+	packet->checksum = in_cksum((uint16_t *) data, packet->size);
 	
-	*((uint16_t *)(data + 4)) = htons(checksum);
+	printf("Packet->checksum %d\n", packet->checksum);
+	
+	printf("RAW: ");
+	for (i = 0; i < packet->size / 2; i++)
+		printf("%d ", ntohs(((int16_t *)data)[i]));
+	printf("\n");
+	
+	//*((int16_t *)(data + 4)) = htons(packet->checksum);
+	((int16_t *)data)[2] = packet->checksum;
+	
+	printf("RAW: ");
+	for (i = 0; i < packet->size / 2; i++)
+		printf("%d ", ntohs(((int16_t *)data)[i]));
+	printf("\n");
+	printf("data[4] checksum: %d\n", ntohs(*((int16_t *)(data + 4))));
+	
+	printf("Constructing packet...\n");
+	print_packet(packet);
+	
 }
 
 int deconstruct(Packet *packet) {
 	uint8_t *data = packet->raw;
 	int i;
 	
-	for (i = 0; i < MAX_LEN - HEADER_LENGTH; i++) 
+	for (i = 0; i < MAX_PACKET_LENGTH; i++) 
 		packet->payload[i] = 0;
-		
-	packet->seq_num = ntohl(*((uint32_t *)data));
+	
+	printf("SEQ#: %d %d %d %d\n", data[0], data[1], data[2], data[3]);
+	printf("SEQ#: %d\n", ntohl(((uint32_t *)data)[0]));
+	
+	packet->seq_num = ntohl(((uint32_t *)data)[0]);
 	
 	packet->checksum = ntohs(*((int16_t *)(data + 4)));
 	packet->flag = data[6];
 	packet->size = ntohl(*((uint32_t *)(data+7)));
 	
-	memcpy(packet->payload, data + HEADER_LENGTH, MAX_LEN - HEADER_LENGTH);
+	memcpy(packet->payload, data + HEADER_LENGTH, packet->size - HEADER_LENGTH);
 	
-	return in_cksum((unsigned short *) data, MAX_LEN);
+	printf("Deconstructing packet...\n");
+	print_packet(packet);
+	
+	return in_cksum((uint16_t *) data, packet->size);
 }
 
 void print_packet(Packet *packet) {
@@ -52,7 +79,7 @@ void print_packet(Packet *packet) {
 		packet->flag, packet->checksum, packet->size);
 	printf("   Data: ");
 	
-	for (i = 0; i < packet->size; i++) 
+	for (i = 0; i < packet->size - HEADER_LENGTH; i++) 
 		printf("%c", packet->payload[i]);
 		
 	printf("\n\n");	

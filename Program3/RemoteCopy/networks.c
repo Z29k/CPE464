@@ -17,6 +17,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <errno.h>
 
 #include "networks.h"
 #include "cpe464.h"
@@ -131,9 +132,11 @@ int32_t send_packet(uint8_t *data, uint32_t len, Connection *connection, uint8_t
 	if ((send_len = sendtoErr(connection->sk_num, packet.raw, packet.size, 0,
 		(struct sockaddr *) &(connection->remote), connection->len)) < 0) {
 		
-		perror("ERROR!! send_buf, sendto");
+		perror("ERROR!! send_packet, sendto");
 		exit(-1);
 	}
+	
+	printf("send_packet() finished %d\n", send_len);
 	
 	return send_len;
 }
@@ -148,7 +151,10 @@ int32_t recv_packet(Packet *packet, int32_t recv_sk_num, Connection *connection)
 		exit(-1);
 	}
 	
-	deconstruct(packet);
+	if (deconstruct(packet) != 0)
+		return CRC_ERROR;
+	
+	connection->len = remote_len;
 	
 	return recv_len - HEADER_LENGTH;
 }

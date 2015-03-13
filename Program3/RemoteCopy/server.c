@@ -31,9 +31,10 @@ enum State {
 	START, DONE, FILENAME, SEND_DATA, WAIT_ON_ACK, TIMEOUT_ON_ACK
 };
 
-void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Connection *client);
+void process_client(int32_t server_sk_num, Packet *packet, 
+	uint8_t *buf, int32_t recv_len, Connection *client);
 
-STATE filename(Connection *client, uint8_t *buf, int32_t recv_len, int32_t *data_file, 
+STATE filename(Connection *client, Packet *packet, uint8_t *buf, int32_t recv_len, int32_t *data_file, 
 	int32_t *bufsize, Window *window);
 
 STATE send_data(Connection *client, uint8_t *packet, int32_t *packet_len, int32_t data_file, 
@@ -49,9 +50,8 @@ int main(int argc, char **argv) {
 	int status = 0;
 	uint8_t buf[MAX_LEN];
 	Connection client;
-	uint8_t flag = 0;
-	int32_t seq_num = 0;
 	int32_t recv_len = 0;
+	Packet packet;
 	
 	//struct sockaddr_in local; //socket address for us
 	//uint32_t len = sizeof(local);
@@ -68,7 +68,8 @@ int main(int argc, char **argv) {
 	
 	while(1) {
 		if (select_call(server_sk_num, 1, 0, NOT_NULL) == 1) {
-			recv_len = recv_buf(buf, 1000, server_sk_num, &client, &flag, &seq_num);
+			//recv_len = recv_buf(buf, 1000, server_sk_num, &client, &flag, &seq_num);
+			recv_len = recv_packet(&packet, server_sk_num, &client);
 			
 			if (recv_len != CRC_ERROR) {
 				/*fork will go here */
@@ -78,7 +79,7 @@ int main(int argc, char **argv) {
 				}
 				//process child
 				if (pid == 0) {
-					process_client(server_sk_num, buf, recv_len, &client);
+					process_client(server_sk_num, &packet, buf, recv_len, &client);
 					exit(0);
 				}
 			}
@@ -92,14 +93,16 @@ int main(int argc, char **argv) {
 	}
 }
 
-void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Connection *client) {
+void process_client(int32_t server_sk_num, Packet *packet, uint8_t *buf, int32_t recv_len, Connection *client) {
 	STATE state = START;
 	int32_t data_file = 0;
 	int32_t packet_len = 0;
-	uint8_t packet[MAX_LEN];
+	uint8_t packet_old[MAX_LEN];
 	int32_t buf_size = 0;
 	int32_t seq_num = START_SEQ_NUM;
 	Window window;
+	
+	printf("Processing Client...\n");
 	
 	while (state != DONE) {
 		
@@ -111,11 +114,11 @@ void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Conne
 			
 			case FILENAME:
 				seq_num = 1;
-				state = filename(client, buf, recv_len, &data_file, &buf_size, &window);
+				state = filename(client, packet, buf, recv_len, &data_file, &buf_size, &window);
 				break;
 				
 			case SEND_DATA:
-				state = send_data(client, packet, &packet_len, data_file, buf_size, &seq_num);
+				state = send_data(client, packet_old, &packet_len, data_file, buf_size, &seq_num);
 				break;
 			
 			case WAIT_ON_ACK:
@@ -123,7 +126,7 @@ void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Conne
 				break;
 			
 			case TIMEOUT_ON_ACK:
-				state = timeout_on_ack(client, packet, packet_len);
+				state = timeout_on_ack(client, packet_old, packet_len);
 				break;
 			
 			case DONE:
@@ -137,14 +140,14 @@ void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Conne
 	}
 }
 
-STATE filename(Connection *client, uint8_t *buf, int32_t recv_len, int32_t *data_file,
+STATE filename(Connection *client, Packet *packet, uint8_t *buf, int32_t recv_len, int32_t *data_file,
 	int32_t *buf_size, Window *window) {
 
 	uint8_t response[1];
 	char fname[MAX_LEN];
 	
-	memcpy(buf_size, buf, 4);
-	memcpy(fname, &buf[4], recv_len - 4);
+	memcpy(buf_size, packet->payload, 4);
+	memcpy(fname, packet->payload + 4, recv_len - 4);
 	
 	/* Create client socket to allow for processing this particular client */
 	
@@ -154,11 +157,13 @@ STATE filename(Connection *client, uint8_t *buf, int32_t recv_len, int32_t *data
 	}
 	
 	if (((*data_file) = open(fname, O_RDONLY)) < 0) {
-		send_buf(response, 0, client, FNAME_BAD, 0, buf);
+		send_packet(response, 0, client, FNAME_BAD, 0);
+		//send_buf(response, 0, client, FNAME_BAD, 0, buf);
 		return DONE;
 	}
 	else {
-		send_buf(response, 0, client, FNAME_OK, 0, buf);
+		send_packet(response, 0, client, FNAME_OK, 0);
+		//send_buf(response, 0, client, FNAME_OK, 0, buf);
 		return SEND_DATA;
 	}
 }
