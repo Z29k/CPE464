@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
 	
 	sendtoErr_init(atof(argv[4]), DROP_ON, FLIP_ON, DEBUG_ON, RSEED_ON);
 	
-	initWindow(&window, atoi(argv[5]));
+	init_window(&window, atoi(argv[5]));
 	
 	state = FILENAME;
 	
@@ -86,6 +86,7 @@ int main(int argc, char **argv) {
 				break;
 				
 			case DONE:
+				destroy_window(&window);
 				break;
 			
 			default:
@@ -97,19 +98,17 @@ int main(int argc, char **argv) {
 }
 	
 STATE filename(char *fname, int32_t buf_size, Window *window) {
-	//uint8_t packet[MAX_LEN];
 	uint8_t buf[MAX_LEN];
 	int32_t fname_len = strlen(fname) + 1;
 	int32_t recv_check = 0;
 	Packet packet;
 	memcpy(buf, &buf_size, 4);
-	memcpy(&buf[4], fname, fname_len);
+	memcpy(buf + 4, &(window->size), 4);
+	memcpy(&buf[8], fname, fname_len);
 	
-	//send_buf(buf, fname_len + 4, &server, FNAME, 0, packet);
-	send_packet(buf, fname_len + 4, &server, FNAME, 0);
+	send_packet(buf, fname_len + 8, &server, FNAME, 0);
 	
 	if (select_call(server.sk_num, 1, 0, NOT_NULL) == 1) {
-		//recv_check = recv_buf(packet, 1000, server.sk_num, &server, &flag, &seq_num);
 		recv_check = recv_packet(&packet, server.sk_num, &server);
 		/*check for bit flip ... if so send the file name again */
 
@@ -129,8 +128,6 @@ STATE filename(char *fname, int32_t buf_size, Window *window) {
 
 STATE recv_data(int32_t output_file, Window *window) {
 	int32_t data_len = 0;
-	//uint8_t data_buf[MAX_LEN];
-	//uint8_t packet_old[MAX_LEN];
 	static int32_t expected_seq_num = START_SEQ_NUM;
 	Packet data_packet;
 	Packet ack;
@@ -142,7 +139,6 @@ STATE recv_data(int32_t output_file, Window *window) {
 	
 	window->bottom = expected_seq_num;
 	
-	//data_len = recv_buf(data_buf, 1400, server.sk_num, &server, &flag, &seq_num);
 	data_len = recv_packet(&data_packet, server.sk_num, &server);
 	
 	/* do state RECV_DATA again if there is a crc error (don't send ack, don't write data) */
@@ -150,7 +146,6 @@ STATE recv_data(int32_t output_file, Window *window) {
 		return RECV_DATA;
 		
 	/* send ACK */
-	//send_buf(packet_old, 1, &server, ACK, 0, packet_old);
 	ack.seq_num = data_packet.seq_num;
 	ack.flag = ACK;
 	ack.size = HEADER_LENGTH;
@@ -165,7 +160,6 @@ STATE recv_data(int32_t output_file, Window *window) {
 	
 	if (data_packet.seq_num == window->bottom) {
 		expected_seq_num++;
-		//write(output_file, &data_buf, data_len);
 		write(output_file, data_packet.payload, data_len);
 	}
 	else

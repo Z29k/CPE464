@@ -5,6 +5,9 @@
 
 #define MAX_PACKET_LENGTH 1400
 
+#include <sys/types.h>
+#include <stdint.h>
+
 typedef struct packet Packet;
 
 struct packet {

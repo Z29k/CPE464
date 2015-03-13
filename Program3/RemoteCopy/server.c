@@ -129,6 +129,7 @@ void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Conne
 				break;
 			
 			case DONE:
+				destroy_window(&window);
 				break;
 			
 			default:
@@ -141,12 +142,14 @@ void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Conne
 
 STATE filename(Connection *client, Packet *packet, uint8_t *buf, int32_t recv_len, int32_t *data_file,
 	int32_t *buf_size, Window *window) {
-
+	int32_t window_size;
 	uint8_t response[1];
 	char fname[MAX_LEN];
 	
 	memcpy(buf_size, packet->payload, 4);
-	memcpy(fname, packet->payload + 4, recv_len - 4);
+	memcpy(&(window_size), packet->payload + 4, 4);
+	init_window(window, window_size);
+	memcpy(fname, packet->payload + 8, recv_len - 8);
 	
 	/* Create client socket to allow for processing this particular client */
 	
