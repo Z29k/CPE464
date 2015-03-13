@@ -21,7 +21,7 @@ int is_closed(Window *window) {
 void add_to_buffer(Window *window, Packet *packet) {
 	int index;
 	
-	index = packet->seq_num % window->size;
+	index = (packet->seq_num - 1) % window->size;
 	
 	memcpy(window->buffer + index, packet, sizeof(Packet));
 	window->valid[index] = 1;
@@ -30,7 +30,7 @@ void add_to_buffer(Window *window, Packet *packet) {
 void remove_from_buffer(Window *window, Packet *packet) {
 	int index;
 	
-	index = packet->seq_num % window->size;
+	index = (packet->seq_num - 1) % window->size;
 	
 	memcpy(packet, window->buffer + index, sizeof(Packet));
 	window->valid[index] = 0;
