@@ -104,7 +104,7 @@ void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Conne
 	Window window;
 	int eof_index;
 	
-	printf("Processing Client...\n");
+	//printf("Processing Client...\n");
 	
 	while (state != DONE) {
 		
@@ -115,38 +115,38 @@ void process_client(int32_t server_sk_num, uint8_t *buf, int32_t recv_len, Conne
 				break;
 			
 			case FILENAME:
-				printf("\nSTATE: FILENAME\n");
+				//printf("\nSTATE: FILENAME\n");
 				seq_num = 1;
 				state = filename(client, packet, buf, recv_len, &data_file, &buf_size, &window);
 				break;
 				
 			case SEND_DATA:
-				printf("\nSTATE: SEND_DATA\n");
+				//printf("\nSTATE: SEND_DATA\n");
 				state = send_data(client, packet, data_file, buf_size, &seq_num, &window, &eof_index);
 				break;
 			
 			case PROCESS:
-				printf("\nSTATE: PROCESS\n");
+				//printf("\nSTATE: PROCESS\n");
 				state = process(client, &window, eof_index);
 				break;
 			
 			case WAIT_ON_ACK:
-				printf("\nSTATE: WAIT_ON_ACK\n");
+				//printf("\nSTATE: WAIT_ON_ACK\n");
 				state = wait_on_ack(client, &window);
 				break;
 			
 			case BYE:
-				printf("\nSTATE: BYE\n");
+				//printf("\nSTATE: BYE\n");
 				state = bye(client, eof_index);
 				break;
 			
 			case DONE:
-				printf("\nSTATE: DONE\n");
+				//printf("\nSTATE: DONE\n");
 				destroy_window(&window);
 				break;
 			
 			default:
-				printf("In default and you should not be here!!!!\n");
+				//printf("In default and you should not be here!!!!\n");
 				state = DONE;
 				break;
 		}
@@ -188,6 +188,7 @@ STATE send_data(Connection *client, Packet *packet, int32_t data_file,
 	
 	// Send a packet
 	if (is_closed(window)) {
+		//printf("Out of packets to send\n");
 		return WAIT_ON_ACK;
 	}
 	else {
@@ -230,18 +231,21 @@ STATE process(Connection *client, Window *window, int eof_index) {
 	crc_check = recv_packet(&incomming, client->sk_num, client);
 	
 	if (crc_check == CRC_ERROR) {
-		printf("CRC errror in packet %d\n", incomming.seq_num);
+		//printf("CRC errror in packet %d\n", incomming.seq_num);
 		return WAIT_ON_ACK;
 	}
 	
 	if (incomming.flag == RR) {
 		rr = incomming.seq_num;
-		slide(window, rr);
+	
+		if (rr > window->bottom)
+			slide(window, rr);
 		
 		if (rr == eof_index)
 			return BYE;
 	}
 	else if (incomming.flag == SREJ) {
+		//printf("Resending packet %d\n", incomming.seq_num);
 		srej = incomming.seq_num;
 		get_from_buffer(window, &resend, srej);
 		resend.flag = RESEND;
@@ -258,7 +262,7 @@ STATE wait_on_ack(Connection *client, Window *window) {
 	
 	send_count++;
 	if (send_count > 10) {
-		printf("Sent data 10 times, no ACK, client session terminated.\n");
+		//printf("Sent data 10 times, no ACK, client session terminated.\n");
 		return DONE;
 	}
 	
@@ -266,7 +270,7 @@ STATE wait_on_ack(Connection *client, Window *window) {
 		get_from_buffer(window, &packet, window->bottom);
 		packet.flag = RESEND;
 	
-		printf("No packets reseived, sending nudge\n");
+		//printf("No packets reseived, sending nudge\n");
 		
 		if (send_packet2(&packet, client) < 0) {
 			perror("send packet, timeout_on_ack");
@@ -286,7 +290,7 @@ STATE bye(Connection *client, int eof_index) {
 	Packet packet;
 	Packet incomming;
 	
-	printf("File Transfer Complete. Sending END_OF_FILE\n");
+	//printf("File Transfer Complete. Sending END_OF_FILE\n");
 	
 	packet.flag = END_OF_FILE;
 	packet.size = HEADER_LENGTH;
@@ -296,7 +300,7 @@ STATE bye(Connection *client, int eof_index) {
 	
 	send_count++;
 	if (send_count > 10) {
-		printf("Sent END_OF_FILE 10 times, no ACK, client session terminated.\n");
+		//printf("Sent END_OF_FILE 10 times, no ACK, client session terminated.\n");
 		return DONE;
 	}
 	
@@ -306,7 +310,7 @@ STATE bye(Connection *client, int eof_index) {
 		crc_check = recv_packet(&incomming, client->sk_num, client);
 	
 		if (crc_check == CRC_ERROR) {
-			printf("CRC errror in packet %d\n", incomming.seq_num);
+			//printf("CRC errror in packet %d\n", incomming.seq_num);
 			return BYE;
 		}
 	

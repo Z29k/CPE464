@@ -33,6 +33,10 @@ int is_in_window(Window *window, int seq_num);
 
 void destroy_window(Window *window);
 
+int empty_buffer(Window *window);
+
 int is_closed(Window *);
+
+void print_window(Window *window);
 
 #endif

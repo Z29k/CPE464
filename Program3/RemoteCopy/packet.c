@@ -45,8 +45,8 @@ int deconstruct(Packet *packet) {
 	
 	// If size is invalid, treat as CRC_ERROR
 	if (packet->size > MAX_PACKET_LENGTH + HEADER_LENGTH) {
-		printf("Invalid size %d when deconstructing packet %d\n",
-			packet->size, packet->seq_num);
+		//printf("Invalid size %d when deconstructing packet %d\n",
+			//packet->size, packet->seq_num);
 		return CRC_ERROR;
 	}
 	
