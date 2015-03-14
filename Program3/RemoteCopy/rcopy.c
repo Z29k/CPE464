@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 	
 	check_args(argc, argv);
 	
-	sendtoErr_init(atof(argv[4]), DROP_OFF, FLIP_OFF, DEBUG_ON, RSEED_ON);
+	sendtoErr_init(atof(argv[4]), DROP_ON, FLIP_ON, DEBUG_ON, RSEED_ON);
 	
 	init_window(&window, atoi(argv[5]));
 	
