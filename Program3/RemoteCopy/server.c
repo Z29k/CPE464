@@ -287,6 +287,8 @@ STATE bye(Connection *client, int eof_index) {
 	printf("File Transfer Complete. Sending END_OF_FILE\n");
 	
 	packet.flag = END_OF_FILE;
+	packet.size = HEADER_LENGTH;
+	packet.seq_num = eof_index;
 	construct(&packet);
 	send_packet2(&packet, client);
 	

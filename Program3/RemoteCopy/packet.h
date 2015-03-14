@@ -13,7 +13,7 @@ typedef struct packet Packet;
 struct packet {
 	uint32_t seq_num;
 	int16_t checksum;
-	uint8_t flag;
+	int8_t flag;
 	uint32_t size;
 	uint8_t payload[MAX_PACKET_LENGTH];
 	uint8_t raw[MAX_PACKET_LENGTH + HEADER_LENGTH];
