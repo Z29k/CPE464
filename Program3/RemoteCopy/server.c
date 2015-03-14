@@ -220,7 +220,7 @@ STATE process(Connection *client, Window *window) {
 	uint32_t crc_check = 0;
 	Packet incomming;
 	Packet resend;
-	int32_t rr;
+	int32_t rr, srej;
 	
 	printf("Reading packet...\n");
 	crc_check = recv_packet(&incomming, client->sk_num, client);
@@ -236,8 +236,9 @@ STATE process(Connection *client, Window *window) {
 		slide(window, rr);
 	}
 	else if (incomming.flag == SREJ) {
-		rr = htonl(((int32_t *)incomming.payload)[0]);
-		get_from_buffer(window, &resend, rr);
+		//rr = htonl(((int32_t *)incomming.payload)[0]);
+		srej = incomming.seq_num;
+		get_from_buffer(window, &resend, srej);
 		send_packet2(&resend, client);
 	}
 	
