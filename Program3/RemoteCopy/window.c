@@ -44,11 +44,13 @@ void remove_from_buffer(Window *window, Packet *packet, int seq_num) {
 	
 	index = (seq_num - 1) % window->size;
 	
+	if (window->valid[index] == 0) {
+		printf("!!!!!!!!!remove_from_buffer invalid packet %d\n", packet->seq_num);
+	}
+	
 	memcpy(packet, window->buffer + index, sizeof(Packet));
 	window->valid[index] = 0;
 	
-	if (window->valid[index] == 0)
-		printf("!!!!!!!!!get_from_buffer invalid packet!!!!!!!!!!\n");
 }
 
 void slide(Window *window, int new_bottom) {

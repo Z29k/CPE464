@@ -99,6 +99,8 @@ int main(int argc, char **argv) {
 				
 			case DONE:
 				printf("\nSTATE: DONE\n");
+				close(output_file);
+				printf("file done\n");
 				destroy_window(&window);
 				break;
 			
@@ -158,8 +160,6 @@ STATE recv_data(Window *window, int32_t output_file) {
 	
 	
 	if (data_packet.flag == END_OF_FILE) {
-		close(output_file);
-		printf("file done\n");
 		send_rr(data_packet.seq_num + 1);
 		return DONE;
 	}
@@ -208,8 +208,7 @@ STATE missing(Window *window, int32_t output_file) {
 		return MISSING;
 	
 	if (data_packet.flag == END_OF_FILE) {
-		if (window->bottom == data_packet.flag) {
-			printf("file done\n");
+		if (window->bottom == data_packet.seq_num) {
 			send_rr(window->bottom + 1);
 			return DONE;
 		}
@@ -227,8 +226,10 @@ STATE missing(Window *window, int32_t output_file) {
 		}
 		
 		for (i = window->bottom; i < window->middle; i++) {
-			remove_from_buffer(window, &to_write, i);
-			write(output_file, to_write.payload, data_len);			
+			if (i <= window->top) {
+				remove_from_buffer(window, &to_write, i);
+				write(output_file, to_write.payload, data_len);
+			}			
 		}
 		
 		send_rr(window->middle);

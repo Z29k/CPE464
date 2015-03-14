@@ -35,7 +35,6 @@ int deconstruct(Packet *packet) {
 	uint8_t *data = packet->raw;
 	int i;
 	
-	printf("Deconsntructing packet\n");
 	for (i = 0; i < MAX_PACKET_LENGTH; i++) 
 		packet->payload[i] = 0;
 	
