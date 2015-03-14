@@ -208,6 +208,7 @@ STATE missing(Window *window, int32_t output_file) {
 		return MISSING;
 	
 	if (data_packet.flag == END_OF_FILE) {
+		printf("Received EOF\n");
 		if (window->bottom == data_packet.seq_num) {
 			send_rr(window->bottom + 1);
 			return DONE;
@@ -253,7 +254,7 @@ void send_rr(int seq_num) {
 	Packet rr;
 	
 	rr.seq_num = seq_num;
-	rr.flag = ACK;
+	rr.flag = RR;
 	rr.size = HEADER_LENGTH;
 	construct(&rr);
 	send_packet2(&rr, &server);

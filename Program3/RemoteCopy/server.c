@@ -234,7 +234,7 @@ STATE process(Connection *client, Window *window, int eof_index) {
 		return WAIT_ON_ACK;
 	}
 	
-	if (incomming.flag == ACK) {
+	if (incomming.flag == RR) {
 		rr = incomming.seq_num;
 		slide(window, rr);
 		
@@ -244,6 +244,7 @@ STATE process(Connection *client, Window *window, int eof_index) {
 	else if (incomming.flag == SREJ) {
 		srej = incomming.seq_num;
 		get_from_buffer(window, &resend, srej);
+		resend.flag = RESEND;
 		send_packet2(&resend, client);
 	}
 	
@@ -263,6 +264,7 @@ STATE wait_on_ack(Connection *client, Window *window) {
 	
 	if (select_call(client->sk_num, 1, 0, NOT_NULL) != 1) {
 		get_from_buffer(window, &packet, window->bottom);
+		packet.flag = RESEND;
 	
 		printf("No packets reseived, sending nudge\n");
 		
@@ -308,7 +310,7 @@ STATE bye(Connection *client, int eof_index) {
 			return BYE;
 		}
 	
-		if (incomming.flag == ACK && incomming.seq_num == eof_index+1) {
+		if (incomming.flag == RR && incomming.seq_num == eof_index+1) {
 			return DONE;
 		}
 	
